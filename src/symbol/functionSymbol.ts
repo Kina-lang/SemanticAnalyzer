@@ -59,7 +59,11 @@ export class KinaSAFunctionSymbol extends KinaSASymbol {
       ...r,
       name: this.name,
       mangledName: this.mangledName,
-      parameters: this._parameters,
+      parameters: this._parameters.map((p) => ({
+        name: p.name,
+        type: p.type,
+        kind: p.kind,
+      })),
       returnType: this._returnType,
       symbols: KinaSASymbolTable.symbolMapToJson(this._children),
     };
