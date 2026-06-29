@@ -1,13 +1,17 @@
-import type { KinaASTParameterDeclarationNode } from "@kina-lang/ast";
+import type {
+  KinaASTParameterDeclarationNode,
+  KinaASTVariableAccessNode,
+} from "@kina-lang/ast";
 import type { IKinaLexerTokenKindType } from "../../../lexer/src";
 import { EKinaSASymbolKind } from "../types/symbol";
 import { KinaSASymbol } from "./_symbol";
 import { KinaSASymbolTable } from "../symbol_table";
+import { KinaSAVariableSymbol } from "./variableSymbol";
 
 export class KinaSAFunctionSymbol extends KinaSASymbol {
   protected readonly _name: string;
   protected readonly _returnType: IKinaLexerTokenKindType;
-  protected readonly _parameters: KinaASTParameterDeclarationNode[];
+  protected readonly _parameters: KinaSAVariableSymbol[];
 
   protected readonly _children: Map<string, KinaSASymbol> = new Map();
   protected _parent: KinaSAFunctionSymbol | null = null;
@@ -21,7 +25,13 @@ export class KinaSAFunctionSymbol extends KinaSASymbol {
 
     this._name = name;
     this._returnType = returnType;
-    this._parameters = parameters;
+    this._parameters = parameters.map(
+      (p) => new KinaSAVariableSymbol(p.name, p.type, this),
+    );
+
+    for (const param of this._parameters) {
+      this.define(param.name, param);
+    }
   }
 
   public get returnType() {
@@ -48,8 +58,8 @@ export class KinaSAFunctionSymbol extends KinaSASymbol {
     return this._name;
   }
 
-  public get mangledName(): string {
-    return `${!this._parent ? `k_fn_Z` : this._parent.mangledName}${this.name.length}${this.name}`;
+  public getMangledName(skipPrefix: boolean = false): string {
+    return `${!this._parent ? (skipPrefix ? "" : `k_fn_Z`) : this._parent.getMangledName()}${this.name.length}${this.name}`;
   }
 
   public override toJson() {
@@ -58,7 +68,7 @@ export class KinaSAFunctionSymbol extends KinaSASymbol {
     return {
       ...r,
       name: this.name,
-      mangledName: this.mangledName,
+      mangledName: this.getMangledName(),
       parameters: this._parameters.map((p) => ({
         name: p.name,
         type: p.type,

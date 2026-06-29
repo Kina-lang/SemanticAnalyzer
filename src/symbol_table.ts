@@ -1,3 +1,4 @@
+import safeJsonValue from "safe-json-value";
 import type { KinaSASymbol } from "./symbol/_symbol";
 
 export class KinaSASymbolTable {
@@ -26,7 +27,11 @@ export class KinaSASymbolTable {
   }
 
   public toJson() {
-    return this.scopes.map((s) => KinaSASymbolTable.symbolMapToJson(s));
+    const { value } = safeJsonValue(
+      this.scopes.map((s) => KinaSASymbolTable.symbolMapToJson(s)),
+    );
+
+    return value;
   }
 
   public static symbolMapToJson(map: Map<string, KinaSASymbol>) {

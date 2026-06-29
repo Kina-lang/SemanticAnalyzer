@@ -13,6 +13,8 @@ import {
   EKinaLexerTokenKind,
   type IKinaLexerTokenKindType,
 } from "../../lexer/src";
+import type { KinaASTExternDeclarationNode } from "@kina-lang/ast/src/nodes/externDeclaration";
+import { KinaSAExternSymbol } from "./symbol/externSymbol";
 
 export class KinaSemanticAnalyzer {
   private readonly ast: KinaASTNode[];
@@ -38,17 +40,18 @@ export class KinaSemanticAnalyzer {
       await this.analyzeNode(node);
     }
 
-    return this.globalSymbolTable.toJson();
+    return this.globalSymbolTable;
   }
 
   private async registerTopLevelSymbols(nodes: KinaASTNode[]) {
     for (const node of nodes) {
-      if (node.kind == EKinaASTNodeKind.FunctionDeclaration) {
+      if (node.kind == EKinaASTNodeKind.FunctionDeclaration)
         await this.registerFunction(
           node as KinaASTFunctionDeclarationNode,
           null,
         );
-      }
+      else if (node.kind == EKinaASTNodeKind.ExternDeclaration)
+        await this.registerExtern(node as KinaASTExternDeclarationNode);
     }
   }
 
@@ -84,6 +87,21 @@ export class KinaSemanticAnalyzer {
         this.registerFunction(stmt as KinaASTFunctionDeclarationNode, symbol);
       }
     }
+  }
+
+  private async registerExtern(node: KinaASTExternDeclarationNode) {
+    const symbol = new KinaSAExternSymbol(
+      node.name,
+      node.returnType,
+      node.parameters,
+    );
+
+    if (this.globalSymbolTable.lookup(node.name))
+      throw new Error(
+        `Symbol ${node.name} is already defined in top level scope!`,
+      );
+
+    this.globalSymbolTable.define(node.name, symbol);
   }
 
   private async analyzeNode(node: KinaASTNode) {
@@ -167,6 +185,12 @@ export class KinaSemanticAnalyzer {
           expectedType,
         );
         break;
+      case EKinaASTNodeKind.ExpressionCall:
+        // TODO: Implement
+        return EKinaLexerTokenKind.TypeInt32;
+      case EKinaASTNodeKind.VariableAccess:
+        // TODO: Implement
+        return EKinaLexerTokenKind.TypeInt32;
       default:
         throw new Error(`Invalid expression type ${node.kind}`);
     }
