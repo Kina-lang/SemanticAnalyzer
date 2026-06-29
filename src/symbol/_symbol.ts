@@ -10,4 +10,10 @@ export class KinaSASymbol {
   public get kind() {
     return this._kind;
   }
+
+  public toJson() {
+    return {
+      kind: this.kind,
+    };
+  }
 }

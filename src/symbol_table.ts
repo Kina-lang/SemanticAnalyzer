@@ -24,4 +24,18 @@ export class KinaSASymbolTable {
 
     return null;
   }
+
+  public toJson() {
+    return this.scopes.map((s) => KinaSASymbolTable.symbolMapToJson(s));
+  }
+
+  public static symbolMapToJson(map: Map<string, KinaSASymbol>) {
+    const symbols: KinaSASymbol[] = [];
+
+    map.forEach((s) => {
+      symbols.push(s);
+    });
+
+    return symbols.map((s) => s.toJson());
+  }
 }

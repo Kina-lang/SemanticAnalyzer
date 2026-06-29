@@ -37,6 +37,8 @@ export class KinaSemanticAnalyzer {
     for (const node of this.ast) {
       await this.analyzeNode(node);
     }
+
+    return this.globalSymbolTable.toJson();
   }
 
   private async registerTopLevelSymbols(nodes: KinaASTNode[]) {
@@ -54,7 +56,11 @@ export class KinaSemanticAnalyzer {
     node: KinaASTFunctionDeclarationNode,
     parentSymbol: KinaSAFunctionSymbol | null,
   ) {
-    const symbol = new KinaSAFunctionSymbol(node.returnType, node.parameters);
+    const symbol = new KinaSAFunctionSymbol(
+      node.name,
+      node.returnType,
+      node.parameters,
+    );
     symbol.setParent(parentSymbol);
 
     if (!parentSymbol) {
@@ -107,6 +113,16 @@ export class KinaSemanticAnalyzer {
         break;
       case EKinaASTNodeKind.ExpressionCall:
         this.analyzeExpressionCall(node as KinaASTCallExpressionNode);
+        break;
+      case EKinaASTNodeKind.ExpressionStatement:
+        // TODO: Implement
+        break;
+      case EKinaASTNodeKind.ExternDeclaration:
+        // TODO: Implement
+        break;
+      case EKinaASTNodeKind.IncludeDirective:
+        // TODO: Implement
+        break;
       default:
         throw new Error(`Invalid node type "${node.kind}"!`);
     }
