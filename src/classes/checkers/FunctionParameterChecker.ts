@@ -6,6 +6,7 @@ import {
 import { KinaAssertionError, KinaSemanticError } from '@kina-lang/utils';
 
 import { BaseChecker } from './_base';
+import type { AnalysisContext } from '../AnalysisContext';
 import type { Scope } from '../Scope';
 import { FunctionParameterSymbol } from '../symbols/FunctionParameterSymbol';
 
@@ -14,7 +15,7 @@ export class FunctionParameterChecker extends BaseChecker {
     super();
   }
 
-  override check(node: BaseNode, scope: Scope): void {
+  override check(node: BaseNode, scope: Scope, ctx: AnalysisContext): void {
     throw new KinaAssertionError(
       'Function parameter nodes should not be checked directly. They are checked as part of the function node.',
     );

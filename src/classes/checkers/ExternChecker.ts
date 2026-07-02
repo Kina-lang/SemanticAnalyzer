@@ -2,6 +2,7 @@ import type { ExternNode } from '@kina-lang/ast';
 import { KinaSemanticError } from '@kina-lang/utils';
 
 import { BaseChecker } from './_base';
+import type { AnalysisContext } from '../AnalysisContext';
 import type { Scope } from '../Scope';
 import { ExternSymbol } from '../symbols/ExternSymbol';
 
@@ -10,7 +11,7 @@ export class ExternChecker extends BaseChecker {
     super();
   }
 
-  override check(node: ExternNode, scope: Scope) {
+  override check(node: ExternNode, scope: Scope, ctx: AnalysisContext) {
     if (scope.existsInCurrentScope(node.name))
       throw new KinaSemanticError(
         `Symbol '${node.name}' is already defined in the current scope.`,

@@ -2,6 +2,7 @@ import { type FunctionNode } from '@kina-lang/ast';
 
 import { BaseChecker } from './_base';
 import { Checkers } from './_index';
+import type { AnalysisContext } from '../AnalysisContext';
 import { Scope } from '../Scope';
 import { FunctionSymbol } from '../symbols/FunctionSymbol';
 
@@ -10,7 +11,7 @@ export class FunctionChecker extends BaseChecker {
     super();
   }
 
-  override check(node: FunctionNode, scope: Scope): void {
+  override check(node: FunctionNode, scope: Scope, ctx: AnalysisContext): void {
     if (scope.existsInCurrentScope(node.name))
       throw new Error(
         `Symbol '${node.name}' is already defined in the current scope.`,
@@ -35,6 +36,11 @@ export class FunctionChecker extends BaseChecker {
 
     scope.define(node.name, functionSymbol);
 
-    Checkers.BasicBlock.check(node.body, functionScope);
+    const previousExpectedReturnType = ctx.getExpectedReturnType();
+    ctx.setExpectedReturnType(node.returnType);
+
+    Checkers.BasicBlock.check(node.body, functionScope, ctx);
+
+    ctx.setExpectedReturnType(previousExpectedReturnType);
   }
 }
