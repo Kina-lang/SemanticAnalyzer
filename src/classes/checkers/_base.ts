@@ -13,5 +13,6 @@ export abstract class ExpressionChecker extends BaseChecker {
     node: BaseNode,
     scope: Scope,
     context: AnalysisContext,
+    wantedType?: KinaTypeTokenKind | null,
   ): KinaTypeTokenKind;
 }

@@ -1,6 +1,7 @@
 import type {
   BaseNode,
   BasicBlockNode,
+  CallExpressionNode,
   ExpressionStatementNode,
   ExternNode,
   FileNode,
@@ -92,6 +93,14 @@ export class KinaSemanticAnalyzer {
         const literalExpressionNode = node as LiteralExpressionNode;
         return Checkers.Expression.Literal.check(
           literalExpressionNode,
+          scope,
+          ctx,
+          wantedType,
+        );
+      case NodeKind.CallExpression:
+        const callExpressionNode = node as CallExpressionNode;
+        return Checkers.Expression.Call.check(
+          callExpressionNode,
           scope,
           ctx,
           wantedType,
