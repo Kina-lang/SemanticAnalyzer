@@ -1,4 +1,6 @@
-import type { BaseSymbol } from "./symbols/_base";
+import { KinaSemanticError } from '@kina-lang/utils';
+
+import type { BaseSymbol } from './symbols/_base';
 
 export class Scope {
   private readonly _parent: Scope | null;
@@ -14,6 +16,11 @@ export class Scope {
    * @param symbol
    */
   public define(name: string, symbol: BaseSymbol) {
+    if (this._symbols.has(name))
+      throw new KinaSemanticError(
+        `Symbol '${name}' is already defined in the current scope.`,
+      );
+
     this._symbols.set(name, symbol);
   }
 
@@ -36,5 +43,20 @@ export class Scope {
    */
   public existsInCurrentScope(name: string): boolean {
     return this._symbols.has(name);
+  }
+
+  /**
+   * Exports the scope as a JSON object.
+   * @returns
+   */
+  public export(): Record<string, unknown> {
+    return {
+      parent: this._parent,
+      symbols: Object.fromEntries(
+        this._symbols
+          .entries()
+          .map(([name, symbol]) => [name, symbol.export()]),
+      ),
+    };
   }
 }

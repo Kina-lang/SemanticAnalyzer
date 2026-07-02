@@ -1,7 +1,8 @@
-import type { ExternNode } from "@kina-lang/ast";
-import { BaseSymbol } from "./_base";
-import { SymbolKind } from "../../types/symbol";
-import type { KinaTypeTokenKind } from "../../types/type";
+import type { ExternNode } from '@kina-lang/ast';
+
+import { BaseSymbol } from './_base';
+import { SymbolKind } from '../../types/symbol';
+import type { KinaTypeTokenKind } from '../../types/type';
 
 export class ExternSymbol extends BaseSymbol<ExternNode> {
   protected readonly _parameterTypes: KinaTypeTokenKind[];
@@ -17,5 +18,21 @@ export class ExternSymbol extends BaseSymbol<ExternNode> {
 
     this._parameterTypes = parameterTypes;
     this._returnType = returnType;
+  }
+
+  public get parameterTypes(): KinaTypeTokenKind[] {
+    return this._parameterTypes;
+  }
+
+  public get returnType(): KinaTypeTokenKind {
+    return this._returnType;
+  }
+
+  public override export(): Record<string, unknown> {
+    return {
+      ...super.export(),
+      parameterTypes: this._parameterTypes,
+      returnType: this._returnType,
+    };
   }
 }

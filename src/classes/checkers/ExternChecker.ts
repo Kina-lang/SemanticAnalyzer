@@ -1,9 +1,9 @@
-import type { BaseNode, ExternNode } from "@kina-lang/ast";
-import type { Scope } from "../Scope";
-import type { BaseSymbol } from "../symbols/_base";
-import { BaseChecker } from "./_base";
-import { KinaSemanticError } from "@kina-lang/utils";
-import { ExternSymbol } from "../symbols/ExternSymbol";
+import type { ExternNode } from '@kina-lang/ast';
+import { KinaSemanticError } from '@kina-lang/utils';
+
+import { BaseChecker } from './_base';
+import type { Scope } from '../Scope';
+import { ExternSymbol } from '../symbols/ExternSymbol';
 
 export class ExternChecker extends BaseChecker {
   constructor() {
@@ -23,5 +23,7 @@ export class ExternChecker extends BaseChecker {
       node.returnType,
     );
     scope.define(node.name, symbol);
+
+    // TODO: Check if extern exists in one of the linked files (if any) and if the signature matches
   }
 }

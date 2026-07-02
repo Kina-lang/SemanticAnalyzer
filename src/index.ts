@@ -1,1 +1,1 @@
-export * from "./classes/KinaSemanticAnalyzer";
+export * from './classes/KinaSemanticAnalyzer';
