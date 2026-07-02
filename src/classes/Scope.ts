@@ -5,9 +5,12 @@ import type { BaseSymbol } from './symbols/_base';
 export class Scope {
   private readonly _parent: Scope | null;
   private readonly _symbols: Map<string, BaseSymbol> = new Map();
+  private readonly _children: Scope[] = [];
 
   constructor(parent: Scope | null) {
     this._parent = parent;
+
+    if (this._parent) this._parent._children.push(this);
   }
 
   /**
@@ -51,12 +54,13 @@ export class Scope {
    */
   public export(): Record<string, unknown> {
     return {
-      parent: this._parent,
+      //parent: this._parent,
       symbols: Object.fromEntries(
         this._symbols
           .entries()
           .map(([name, symbol]) => [name, symbol.export()]),
       ),
+      children: this._children.map((child) => child.export()),
     };
   }
 }

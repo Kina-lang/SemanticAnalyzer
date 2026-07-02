@@ -1,8 +1,10 @@
 import type {
   BaseNode,
+  BasicBlockNode,
   ExternNode,
   FileNode,
-  FunctionNode
+  FunctionNode,
+  VariableDeclarationStatementNode,
 } from '@kina-lang/ast';
 import { NodeKind } from '@kina-lang/ast';
 import { KinaAssertionError } from '@kina-lang/utils';
@@ -39,9 +41,18 @@ export class KinaSemanticAnalyzer {
         const functionNode = node as FunctionNode;
         Checkers.Function.check(functionNode, scope);
         break;
+      case NodeKind.VariableDeclarationStatement:
+        const variableDeclarationNode =
+          node as VariableDeclarationStatementNode;
+        Checkers.VariableDeclaration.check(variableDeclarationNode, scope);
+        break;
       case NodeKind.IncludeDirective:
         // no op: Ignored
         // TODO: Add symbol registration so that we can correctly check extern signatures
+        break;
+      case NodeKind.BasicBlock:
+        const basicBlockNode = node as BasicBlockNode;
+        Checkers.BasicBlock.check(basicBlockNode, scope);
         break;
       default:
         throw new KinaAssertionError('Unknown node kind: ' + node.kind);

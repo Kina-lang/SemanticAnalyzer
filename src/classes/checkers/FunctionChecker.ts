@@ -35,6 +35,6 @@ export class FunctionChecker extends BaseChecker {
 
     scope.define(node.name, functionSymbol);
 
-    // TODO: Check the function body
+    Checkers.BasicBlock.check(node.body, functionScope);
   }
 }
