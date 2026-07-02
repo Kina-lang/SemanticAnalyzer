@@ -1,5 +1,6 @@
 import { BasicBlockChecker } from './BasicBlockChecker';
 import { LiteralExpressionChecker } from './expressions/LiteralExpressionChecker';
+import { ExpressionStatementChecker } from './ExpressionStatementChecker';
 import { ExternChecker } from './ExternChecker';
 import { FileChecker } from './FileChecker';
 import { FunctionChecker } from './FunctionChecker';
@@ -15,6 +16,7 @@ export const Checkers = {
   BasicBlock: new BasicBlockChecker(),
   VariableDeclaration: new VariableDeclarationChecker(),
   ReturnStatement: new ReturnStatementChecker(),
+  ExpressionStatement: new ExpressionStatementChecker(),
   Expression: {
     Literal: new LiteralExpressionChecker(),
   },

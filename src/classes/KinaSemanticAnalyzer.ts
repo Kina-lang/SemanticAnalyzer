@@ -1,6 +1,7 @@
 import type {
   BaseNode,
   BasicBlockNode,
+  ExpressionStatementNode,
   ExternNode,
   FileNode,
   FunctionNode,
@@ -66,6 +67,10 @@ export class KinaSemanticAnalyzer {
       case NodeKind.ReturnStatement:
         const returnStatementNode = node as ReturnStatementNode;
         Checkers.ReturnStatement.check(returnStatementNode, scope, ctx);
+        break;
+      case NodeKind.ExpressionStatement:
+        const expressionStatementNode = node as ExpressionStatementNode;
+        Checkers.ExpressionStatement.check(expressionStatementNode, scope, ctx);
         break;
       case NodeKind.IncludeDirective:
         // no op: Ignored
