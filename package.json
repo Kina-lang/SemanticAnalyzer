@@ -11,9 +11,6 @@
     "@kina-lang/ast": "workspace:*",
     "@kina-lang/utils": "workspace:*"
   },
-  "bin": {
-    "kinc": "./src/bin/cli.ts"
-  },
   "keywords": [],
   "author": "",
   "license": "ISC",
