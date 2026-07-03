@@ -12,6 +12,14 @@ export class ExternChecker extends BaseChecker {
   }
 
   override check(node: ExternNode, scope: Scope, ctx: AnalysisContext) {
+    // TODO: Check if extern exists in one of the linked files (if any) and if the signature matches
+  }
+
+  override firstPass(
+    node: ExternNode,
+    scope: Scope,
+    context: AnalysisContext,
+  ): void {
     if (scope.existsInCurrentScope(node.name))
       throw new KinaSemanticError(
         `Symbol '${node.name}' is already defined in the current scope.`,
@@ -24,7 +32,5 @@ export class ExternChecker extends BaseChecker {
       node.returnType,
     );
     scope.define(node.name, symbol);
-
-    // TODO: Check if extern exists in one of the linked files (if any) and if the signature matches
   }
 }

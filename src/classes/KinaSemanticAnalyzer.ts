@@ -27,11 +27,30 @@ export class KinaSemanticAnalyzer {
     const rootScope = new Scope(null);
     const ctx = new AnalysisContext();
 
-    KinaSemanticAnalyzer.checkNode(ast, rootScope, ctx);
+    this.firstPass(ast, rootScope, ctx);
+    this.secondPass(ast, rootScope, ctx);
 
     this.validateRules(rootScope, ctx);
 
     return rootScope;
+  }
+
+  // First pass, register only
+  public firstPass(
+    ast: FileNode,
+    rootScope: Scope,
+    ctx: AnalysisContext,
+  ): void {
+    KinaSemanticAnalyzer.firstPassNode(ast, rootScope, ctx);
+  }
+
+  // Second pass, validate
+  public secondPass(
+    ast: FileNode,
+    rootScope: Scope,
+    ctx: AnalysisContext,
+  ): void {
+    KinaSemanticAnalyzer.checkNode(ast, rootScope, ctx);
   }
 
   public static checkNodes(
@@ -82,6 +101,36 @@ export class KinaSemanticAnalyzer {
       case NodeKind.IncludeDirective:
         // no op: Ignored
         // TODO: Add symbol registration so that we can correctly check extern signatures
+        break;
+      default:
+        throw new KinaAssertionError('Unknown node kind: ' + node.kind);
+    }
+  }
+
+  public static firstPassNode(
+    node: BaseNode,
+    scope: Scope,
+    ctx: AnalysisContext,
+  ): void {
+    switch (node.kind) {
+      case NodeKind.File:
+        const fileNode = node as FileNode;
+        Checkers.File.firstPass(fileNode, scope, ctx);
+        break;
+      case NodeKind.Extern:
+        const externNode = node as ExternNode;
+        Checkers.Extern.firstPass(externNode, scope, ctx);
+        break;
+      case NodeKind.Function:
+        const functionNode = node as FunctionNode;
+        Checkers.Function.firstPass(functionNode, scope, ctx);
+        break;
+      case NodeKind.VariableDeclarationStatement:
+      case NodeKind.BasicBlock:
+      case NodeKind.ReturnStatement:
+      case NodeKind.ExpressionStatement:
+      case NodeKind.IncludeDirective:
+        // no op: Ignored
         break;
       default:
         throw new KinaAssertionError('Unknown node kind: ' + node.kind);
