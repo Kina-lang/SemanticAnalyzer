@@ -15,4 +15,14 @@ export class FileChecker extends BaseChecker {
       KinaSemanticAnalyzer.checkNode(subNode, scope, ctx);
     }
   }
+
+  override firstPass(
+    node: FileNode,
+    scope: Scope,
+    context: AnalysisContext,
+  ): void {
+    for (const subNode of node.nodes) {
+      KinaSemanticAnalyzer.firstPassNode(subNode, scope, context);
+    }
+  }
 }

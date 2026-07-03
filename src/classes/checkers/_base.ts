@@ -6,6 +6,11 @@ import type { Scope } from '../Scope';
 
 export abstract class BaseChecker {
   abstract check(node: BaseNode, scope: Scope, context: AnalysisContext): void;
+  abstract firstPass?(
+    node: BaseNode,
+    scope: Scope,
+    context: AnalysisContext,
+  ): void;
 }
 
 export abstract class ExpressionChecker extends BaseChecker {

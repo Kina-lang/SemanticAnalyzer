@@ -1,4 +1,5 @@
 import { type FunctionNode } from '@kina-lang/ast';
+import { KinaAssertionError } from '@kina-lang/utils';
 
 import { BaseChecker } from './_base';
 import { Checkers } from './_index';
@@ -12,6 +13,29 @@ export class FunctionChecker extends BaseChecker {
   }
 
   override check(node: FunctionNode, scope: Scope, ctx: AnalysisContext): void {
+    const functionSymbol = scope.lookup(node.name);
+    if (!functionSymbol || !(functionSymbol instanceof FunctionSymbol))
+      throw new KinaAssertionError(
+        `Function '${node.name}' is not defined in the current scope.`,
+      );
+
+    const functionScope = functionSymbol.scope;
+
+    const previousExpectedReturnType = ctx.getExpectedReturnType();
+    ctx.setExpectedReturnType(node.returnType);
+
+    // TODO: Ensure that the block ALWAYS returns on all code paths
+    //       using reachability analysis and control flow graph (CFG) analysis.
+    Checkers.BasicBlock.check(node.body, functionScope, ctx);
+
+    ctx.setExpectedReturnType(previousExpectedReturnType);
+  }
+
+  override firstPass(
+    node: FunctionNode,
+    scope: Scope,
+    context: AnalysisContext,
+  ): void {
     if (scope.existsInCurrentScope(node.name))
       throw new Error(
         `Symbol '${node.name}' is already defined in the current scope.`,
@@ -35,14 +59,5 @@ export class FunctionChecker extends BaseChecker {
     );
 
     scope.define(node.name, functionSymbol);
-
-    const previousExpectedReturnType = ctx.getExpectedReturnType();
-    ctx.setExpectedReturnType(node.returnType);
-
-    // TODO: Ensure that the block ALWAYS returns on all code paths
-    //       using reachability analysis and control flow graph (CFG) analysis.
-    Checkers.BasicBlock.check(node.body, functionScope, ctx);
-
-    ctx.setExpectedReturnType(previousExpectedReturnType);
   }
 }
