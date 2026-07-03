@@ -4,6 +4,7 @@ import { KinaAssertionError, KinaSemanticError } from '@kina-lang/utils';
 import { ExpressionChecker } from '../_base';
 import type { KinaTypeTokenKind } from '../../../types/type';
 import type { AnalysisContext } from '../../AnalysisContext';
+import { KinaSemanticAnalyzer } from '../../KinaSemanticAnalyzer';
 import type { Scope } from '../../Scope';
 import { ExternSymbol } from '../../symbols/ExternSymbol';
 import { FunctionSymbol } from '../../symbols/FunctionSymbol';
@@ -39,8 +40,40 @@ export class CallExpressionChecker extends ExpressionChecker {
         'Callee of a call expression must be a function or an extern.',
       );
 
-    // TODO: Check parameter types
+    this.checkParameters(node, symbol, scope, context);
 
     return symbol.returnType;
+  }
+
+  private checkParameters(
+    node: CallExpressionNode,
+    symbol: FunctionSymbol | ExternSymbol,
+    scope: Scope,
+    context: AnalysisContext,
+  ) {
+    const expectedParameterTypes = symbol.parameterTypes;
+    const actualParameterTypes = node.arguments.map((arg, i) =>
+      KinaSemanticAnalyzer.checkExpression(
+        arg,
+        scope,
+        context,
+        expectedParameterTypes[i] ?? null,
+      ),
+    );
+
+    if (actualParameterTypes.length !== expectedParameterTypes.length)
+      throw new KinaSemanticError(
+        `Expected ${expectedParameterTypes.length} arguments, but got ${actualParameterTypes.length}.`,
+      );
+
+    for (let i = 0; i < expectedParameterTypes.length; i++) {
+      const expectedType = expectedParameterTypes[i];
+      const actualType = actualParameterTypes[i];
+
+      if (actualType !== expectedType)
+        throw new KinaSemanticError(
+          `Argument ${i + 1} has type ${actualType}, but expected ${expectedType}.`,
+        );
+    }
   }
 }

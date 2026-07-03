@@ -29,6 +29,10 @@ export class FunctionSymbol extends BaseSymbol<FunctionNode> {
     return this._parameterSymbols;
   }
 
+  public get parameterTypes(): KinaTypeTokenKind[] {
+    return this._parameterSymbols.map((param) => param.type);
+  }
+
   public get returnType(): KinaTypeTokenKind {
     return this._returnType;
   }

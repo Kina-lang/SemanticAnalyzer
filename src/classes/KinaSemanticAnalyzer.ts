@@ -6,6 +6,7 @@ import type {
   ExternNode,
   FileNode,
   FunctionNode,
+  IdentifierExpressionNode,
   LiteralExpressionNode,
   ReturnStatementNode,
   VariableDeclarationStatementNode,
@@ -101,6 +102,14 @@ export class KinaSemanticAnalyzer {
         const callExpressionNode = node as CallExpressionNode;
         return Checkers.Expression.Call.check(
           callExpressionNode,
+          scope,
+          ctx,
+          wantedType,
+        );
+      case NodeKind.IdentifierExpression:
+        const identifierExpressionNode = node as IdentifierExpressionNode;
+        return Checkers.Expression.Identifier.check(
+          identifierExpressionNode,
           scope,
           ctx,
           wantedType,
