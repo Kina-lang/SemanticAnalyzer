@@ -1,6 +1,7 @@
 import type {
   BaseNode,
   BasicBlockNode,
+  BinaryExpressionNode,
   CallExpressionNode,
   ExpressionStatementNode,
   ExternNode,
@@ -119,6 +120,14 @@ export class KinaSemanticAnalyzer {
         const groupExpressionNode = node as GroupExpressionNode;
         return Checkers.Expression.Group.check(
           groupExpressionNode,
+          scope,
+          ctx,
+          wantedType,
+        );
+      case NodeKind.BinaryExpression:
+        const binaryExpressionNode = node as BinaryExpressionNode;
+        return Checkers.Expression.Binary.check(
+          binaryExpressionNode,
           scope,
           ctx,
           wantedType,

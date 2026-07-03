@@ -27,7 +27,7 @@ export class IdentifierExpressionChecker extends ExpressionChecker {
     // TODO: Add support
     if (
       symbol.kind !== SymbolKind.Variable &&
-      symbol.kind !== SymbolKind.Parameter
+      symbol.kind !== SymbolKind.FunctionParameter
     )
       throw new KinaSemanticError(
         `Identifier ${node.name} is a ${symbol.kind.toLowerCase()} and cannot be used as an expression (for now).`,
