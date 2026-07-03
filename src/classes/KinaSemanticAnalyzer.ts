@@ -132,6 +132,11 @@ export class KinaSemanticAnalyzer {
           ctx,
           wantedType,
         );
+      case NodeKind.MemberAccessExpression:
+        // TODO: Implement
+        throw new KinaAssertionError(
+          'Member access expressions are not yet supported.',
+        );
       default:
         throw new KinaAssertionError(
           'Unknown expression node kind: ' + node.kind,
