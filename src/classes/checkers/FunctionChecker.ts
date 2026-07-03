@@ -39,6 +39,8 @@ export class FunctionChecker extends BaseChecker {
     const previousExpectedReturnType = ctx.getExpectedReturnType();
     ctx.setExpectedReturnType(node.returnType);
 
+    // TODO: Ensure that the block ALWAYS returns on all code paths
+    //       using reachability analysis and control flow graph (CFG) analysis.
     Checkers.BasicBlock.check(node.body, functionScope, ctx);
 
     ctx.setExpectedReturnType(previousExpectedReturnType);
