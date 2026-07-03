@@ -18,6 +18,7 @@ import { KinaAssertionError } from '@kina-lang/utils';
 
 import { AnalysisContext } from './AnalysisContext';
 import { Checkers } from './checkers/_index';
+import { Rules } from './rules/_index';
 import { Scope } from './Scope';
 import type { KinaTypeTokenKind } from '../types/type';
 
@@ -27,6 +28,8 @@ export class KinaSemanticAnalyzer {
     const ctx = new AnalysisContext();
 
     KinaSemanticAnalyzer.checkNode(ast, rootScope, ctx);
+
+    this.validateRules(rootScope, ctx);
 
     return rootScope;
   }
@@ -141,6 +144,12 @@ export class KinaSemanticAnalyzer {
         throw new KinaAssertionError(
           'Unknown expression node kind: ' + node.kind,
         );
+    }
+  }
+
+  public validateRules(scope: Scope, ctx: AnalysisContext): void {
+    for (const rule of Rules) {
+      rule.validate(scope, ctx);
     }
   }
 }
