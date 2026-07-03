@@ -8,11 +8,13 @@ export abstract class BaseSymbol<DeclarationNode extends BaseNode = BaseNode> {
   protected readonly _kind: SymbolKind;
   protected readonly _name: string;
   protected readonly _node: DeclarationNode;
+  protected readonly _mangledName: string;
 
   constructor(kind: SymbolKind, node: DeclarationNode, name: string) {
     this._kind = kind;
     this._node = node;
     this._name = name;
+    this._mangledName = 'Z' + randomBytes(8).toString('hex');
   }
 
   public get kind(): SymbolKind {
@@ -28,7 +30,7 @@ export abstract class BaseSymbol<DeclarationNode extends BaseNode = BaseNode> {
   }
 
   public get mangledName(): string {
-    return randomBytes(8).toString('hex');
+    return this._mangledName;
   }
 
   public export(): Record<string, unknown> {
