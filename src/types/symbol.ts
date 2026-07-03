@@ -1,5 +1,6 @@
-export enum EKinaSASymbolKind {
-  Function = "kina.symbol.function",
-  Extern = "kina.symbol.extern",
-  Variable = "kina.symbol.variable",
+export enum SymbolKind {
+  Variable = 'sym.Variable',
+  Function = 'sym.Function',
+  FunctionParameter = 'sym.FunctionParameter',
+  Extern = 'sym.Extern',
 }
