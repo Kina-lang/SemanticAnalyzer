@@ -28,6 +28,11 @@ export class ExternSymbol extends BaseSymbol<ExternNode> {
     return this._returnType;
   }
 
+  public override get mangledName(): string {
+    // Override: MUST be the same as the name declared in the source code, since this is an external symbol
+    return this._name;
+  }
+
   public override export(): Record<string, unknown> {
     return {
       ...super.export(),

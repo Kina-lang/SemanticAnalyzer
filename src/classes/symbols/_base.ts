@@ -1,7 +1,8 @@
+import { randomBytes } from 'crypto';
+import { inspect } from 'util';
 import type { BaseNode } from '@kina-lang/ast';
 
 import type { SymbolKind } from '../../types/symbol';
-import { inspect } from 'util';
 
 export abstract class BaseSymbol<DeclarationNode extends BaseNode = BaseNode> {
   protected readonly _kind: SymbolKind;
@@ -26,11 +27,16 @@ export abstract class BaseSymbol<DeclarationNode extends BaseNode = BaseNode> {
     return this._node;
   }
 
+  public get mangledName(): string {
+    return randomBytes(8).toString('hex');
+  }
+
   public export(): Record<string, unknown> {
     return {
       kind: this._kind,
       name: this._name,
       node: inspect(this._node, { depth: null, colors: true }),
+      mangledName: this.mangledName,
     };
   }
 }
