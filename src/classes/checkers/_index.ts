@@ -4,6 +4,7 @@ import { CallExpressionChecker } from './expressions/CallExpressionChecker';
 import { GroupExpressionChecker } from './expressions/GroupExpressionChecker';
 import { IdentifierExpressionChecker } from './expressions/IdentifierExpressionChecker';
 import { LiteralExpressionChecker } from './expressions/LiteralExpressionChecker';
+import { UnaryExpressionChecker } from './expressions/UnaryExpressionChecker';
 import { ExpressionStatementChecker } from './ExpressionStatementChecker';
 import { ExternChecker } from './ExternChecker';
 import { FileChecker } from './FileChecker';
@@ -27,5 +28,6 @@ export const Checkers = {
     Identifier: new IdentifierExpressionChecker(),
     Group: new GroupExpressionChecker(),
     Binary: new BinaryExpressionChecker(),
+    Unary: new UnaryExpressionChecker(),
   },
 };

@@ -11,6 +11,7 @@ import type {
   IdentifierExpressionNode,
   LiteralExpressionNode,
   ReturnStatementNode,
+  UnaryExpressionNode,
   VariableDeclarationStatementNode,
 } from '@kina-lang/ast';
 import { NodeKind } from '@kina-lang/ast';
@@ -180,6 +181,14 @@ export class KinaSemanticAnalyzer {
         const binaryExpressionNode = node as BinaryExpressionNode;
         return Checkers.Expression.Binary.check(
           binaryExpressionNode,
+          scope,
+          ctx,
+          wantedType,
+        );
+      case NodeKind.UnaryExpression:
+        const unaryExpressionNode = node as UnaryExpressionNode;
+        return Checkers.Expression.Unary.check(
+          unaryExpressionNode,
           scope,
           ctx,
           wantedType,
