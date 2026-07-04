@@ -21,9 +21,16 @@ export class FunctionParameterChecker extends BaseChecker {
     );
   }
 
+  override firstPass(
+    node: BaseNode,
+    scope: Scope,
+    context: AnalysisContext,
+  ): void {}
+
   checkParameter(
     node: FunctionParameterNode,
     scope: Scope,
+    index: number,
   ): FunctionParameterSymbol {
     if (scope.existsInCurrentScope(node.name))
       throw new KinaSemanticError(
@@ -34,6 +41,6 @@ export class FunctionParameterChecker extends BaseChecker {
         `Expected a FunctionParameterNode, but got ${node.kind}.`,
       );
 
-    return new FunctionParameterSymbol(node, node.name, node.type);
+    return new FunctionParameterSymbol(node, node.name, node.type, index);
   }
 }

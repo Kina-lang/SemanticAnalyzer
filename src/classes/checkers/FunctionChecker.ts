@@ -42,8 +42,8 @@ export class FunctionChecker extends BaseChecker {
       );
 
     const functionScope = new Scope(scope);
-    const parameterSymbols = node.parameters.map((param) =>
-      Checkers.FunctionParameter.checkParameter(param, functionScope),
+    const parameterSymbols = node.parameters.map((param, index) =>
+      Checkers.FunctionParameter.checkParameter(param, functionScope, index),
     );
 
     parameterSymbols.forEach((param) =>
