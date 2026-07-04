@@ -1,4 +1,5 @@
 import {
+  BaseNode,
   IdentifierExpressionNode,
   NodeKind,
   type BinaryExpressionNode,
@@ -28,11 +29,50 @@ export class BinaryExpressionChecker extends ExpressionChecker {
     switch (node.operator) {
       case '=':
         return this.checkAssignment(node, scope, context, wantedType);
+      case '+':
+      case '-':
+      case '*':
+      case '/':
+      case '%':
+        return this.checkMathOperation(node, scope, context, wantedType);
       default:
         throw new KinaAssertionError(
           'Unknown binary operator: ' + node.operator,
         );
     }
+  }
+
+  override firstPass(
+    node: BaseNode,
+    scope: Scope,
+    context: AnalysisContext,
+  ): void {}
+
+  private checkMathOperation(
+    node: BinaryExpressionNode,
+    scope: Scope,
+    context: AnalysisContext,
+    wantedType?: KinaTypeTokenKind | null,
+  ): KinaTypeTokenKind {
+    const leftType = KinaSemanticAnalyzer.checkExpression(
+      node.left,
+      scope,
+      context,
+      wantedType,
+    );
+    const rightType = KinaSemanticAnalyzer.checkExpression(
+      node.right,
+      scope,
+      context,
+      wantedType,
+    );
+
+    if (leftType !== rightType)
+      throw new KinaSemanticError(
+        `Type mismatch in binary operation: left side is '${leftType}', right side is '${rightType}'.`,
+      );
+
+    return leftType;
   }
 
   private checkAssignment(
