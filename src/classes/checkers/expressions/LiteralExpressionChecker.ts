@@ -1,4 +1,4 @@
-import type { LiteralExpressionNode } from '@kina-lang/ast';
+import type { BaseNode, LiteralExpressionNode } from '@kina-lang/ast';
 import { TokenKind } from '@kina-lang/lexer';
 import { KinaAssertionError } from '@kina-lang/utils';
 
@@ -28,12 +28,20 @@ export class LiteralExpressionChecker extends ExpressionChecker {
     switch (node.literalType) {
       case TokenKind.LiteralInteger:
         return this.getIntegerLiteralType(node, scope, context, wantedType);
+      case TokenKind.LiteralBoolean:
+        return this.getBooleanLiteralType(node, scope, context, wantedType);
       default:
         throw new KinaAssertionError(
           `Unknown literal type: ${node.literalType}`,
         );
     }
   }
+
+  override firstPass(
+    node: BaseNode,
+    scope: Scope,
+    context: AnalysisContext,
+  ): void {}
 
   private getIntegerLiteralType(
     node: LiteralExpressionNode,
@@ -50,5 +58,15 @@ export class LiteralExpressionChecker extends ExpressionChecker {
     //       fallback (BUT NOT the wanted type!)
 
     return wantedType;
+  }
+
+  private getBooleanLiteralType(
+    node: LiteralExpressionNode,
+    scope: Scope,
+    context: AnalysisContext,
+    wantedType: KinaTypeTokenKind | null = null,
+  ): KinaTypeTokenKind {
+    // TODO: Add casting into numbers?
+    return TokenKind.TypeBool;
   }
 }
