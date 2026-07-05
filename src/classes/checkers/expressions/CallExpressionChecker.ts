@@ -1,4 +1,4 @@
-import { NodeKind, type CallExpressionNode } from '@kina-lang/ast';
+import { BaseNode, NodeKind, type CallExpressionNode } from '@kina-lang/ast';
 import { KinaAssertionError, KinaSemanticError } from '@kina-lang/utils';
 
 import { ExpressionChecker } from '../_base';
@@ -44,6 +44,12 @@ export class CallExpressionChecker extends ExpressionChecker {
 
     return symbol.returnType;
   }
+
+  override firstPass(
+    node: BaseNode,
+    scope: Scope,
+    context: AnalysisContext,
+  ): void {}
 
   private checkParameters(
     node: CallExpressionNode,

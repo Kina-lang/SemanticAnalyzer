@@ -4,6 +4,7 @@ import {
   NodeKind,
   type BinaryExpressionNode,
 } from '@kina-lang/ast';
+import { TokenKind } from '@kina-lang/lexer';
 import { KinaAssertionError, KinaSemanticError } from '@kina-lang/utils';
 
 import { ExpressionChecker } from '../_base';
@@ -16,6 +17,13 @@ import type { FunctionParameterSymbol } from '../../symbols/FunctionParameterSym
 import type { VariableSymbol } from '../../symbols/VariableSymbol';
 
 export class BinaryExpressionChecker extends ExpressionChecker {
+  /**
+   * Set of types that are valid for integer literals.
+   */
+  private readonly _integerLiteralTypes: Set<KinaTypeTokenKind> = new Set([
+    TokenKind.TypeInt,
+  ]);
+
   constructor() {
     super();
   }
@@ -35,6 +43,15 @@ export class BinaryExpressionChecker extends ExpressionChecker {
       case '/':
       case '%':
         return this.checkMathOperation(node, scope, context, wantedType);
+      case '&&':
+      case '||':
+      case '==':
+      case '!=':
+      case '<':
+      case '<=':
+      case '>':
+      case '>=':
+        return this.checkLogicalOperation(node, scope, context, wantedType);
       default:
         throw new KinaAssertionError(
           'Unknown binary operator: ' + node.operator,
@@ -67,12 +84,70 @@ export class BinaryExpressionChecker extends ExpressionChecker {
       wantedType,
     );
 
-    if (leftType !== rightType)
+    if (
+      leftType !== rightType ||
+      !this._integerLiteralTypes.has(leftType) ||
+      !this._integerLiteralTypes.has(rightType)
+    )
       throw new KinaSemanticError(
         `Type mismatch in binary operation: left side is '${leftType}', right side is '${rightType}'.`,
       );
 
     return leftType;
+  }
+
+  private checkLogicalOperation(
+    node: BinaryExpressionNode,
+    scope: Scope,
+    context: AnalysisContext,
+    wantedType?: KinaTypeTokenKind | null,
+  ): KinaTypeTokenKind {
+    const leftType = KinaSemanticAnalyzer.checkExpression(
+      node.left,
+      scope,
+      context,
+      wantedType,
+    );
+    const rightType = KinaSemanticAnalyzer.checkExpression(
+      node.right,
+      scope,
+      context,
+      wantedType,
+    );
+
+    if (node.operator === '&&' || node.operator === '||') {
+      if (leftType !== TokenKind.TypeBool || rightType !== TokenKind.TypeBool)
+        throw new KinaSemanticError(
+          `Logical operators '&&' and '||' require both operands to be of type 'bool'. Left side is '${leftType}', right side is '${rightType}'.`,
+        );
+
+      return leftType;
+    } else if (node.operator === '==' || node.operator === '!=') {
+      if (leftType !== rightType)
+        throw new KinaSemanticError(
+          `Comparison operators require both operands to be of the same type. Left side is '${leftType}', right side is '${rightType}'.`,
+        );
+
+      return TokenKind.TypeBool;
+    } else if (
+      node.operator === '<' ||
+      node.operator === '<=' ||
+      node.operator === '>' ||
+      node.operator === '>='
+    ) {
+      if (
+        leftType != rightType ||
+        !this._integerLiteralTypes.has(leftType) ||
+        !this._integerLiteralTypes.has(rightType)
+      )
+        throw new KinaSemanticError(
+          `Type mismatch in binary operation: left side is '${leftType}', right side is '${rightType}'.`,
+        );
+
+      return TokenKind.TypeBool;
+    }
+
+    throw new KinaAssertionError(`Unknown logical operator: ${node.operator}`);
   }
 
   private checkAssignment(
