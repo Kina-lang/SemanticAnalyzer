@@ -11,6 +11,7 @@ import { FileChecker } from './FileChecker';
 import { FunctionChecker } from './FunctionChecker';
 import { FunctionParameterChecker } from './FunctionParameterChecker';
 import { IfStatementChecker } from './IfStatementChecker';
+import { ImportChecker } from './ImportChecker';
 import { ReturnStatementChecker } from './ReturnStatementChecker';
 import { VariableDeclarationChecker } from './VariableDeclarationChecker';
 
@@ -24,6 +25,7 @@ export const Checkers = {
   VariableDeclaration: new VariableDeclarationChecker(),
   ReturnStatement: new ReturnStatementChecker(),
   ExpressionStatement: new ExpressionStatementChecker(),
+  Import: new ImportChecker(),
   Expression: {
     Literal: new LiteralExpressionChecker(),
     Call: new CallExpressionChecker(),

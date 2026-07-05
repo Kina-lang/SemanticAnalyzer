@@ -8,6 +8,7 @@ import { KinaSemanticAnalyzer } from '../../KinaSemanticAnalyzer';
 import type { Scope } from '../../Scope';
 import { ExternSymbol } from '../../symbols/ExternSymbol';
 import { FunctionSymbol } from '../../symbols/FunctionSymbol';
+import { ImportedFunctionSymbol } from '../../symbols/ImportedFunctionSymbol';
 
 export class CallExpressionChecker extends ExpressionChecker {
   constructor() {
@@ -35,7 +36,11 @@ export class CallExpressionChecker extends ExpressionChecker {
 
     // TODO: Add support for checking signatures to allow calling
     //       even variables for example, if they are of function type (once we have function types)
-    if (!(symbol instanceof FunctionSymbol || symbol instanceof ExternSymbol))
+    if (!(
+      symbol instanceof FunctionSymbol ||
+      symbol instanceof ExternSymbol ||
+      symbol instanceof ImportedFunctionSymbol
+    ))
       throw new KinaSemanticError(
         'Callee of a call expression must be a function or an extern.',
       );
@@ -53,7 +58,7 @@ export class CallExpressionChecker extends ExpressionChecker {
 
   private checkParameters(
     node: CallExpressionNode,
-    symbol: FunctionSymbol | ExternSymbol,
+    symbol: FunctionSymbol | ExternSymbol | ImportedFunctionSymbol,
     scope: Scope,
     context: AnalysisContext,
   ) {

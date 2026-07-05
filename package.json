@@ -10,7 +10,8 @@
   "dependencies": {
     "@kina-lang/ast": "workspace:*",
     "@kina-lang/lexer": "workspace:*",
-    "@kina-lang/utils": "workspace:*"
+    "@kina-lang/utils": "workspace:*",
+    "@kina-lang/compiler": "workspace:*"
   },
   "keywords": [],
   "author": "",

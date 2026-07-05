@@ -1,9 +1,16 @@
+import type { KinaCompiler } from '@kina-lang/compiler';
+
 import type { KinaTypeTokenKind } from '../types/type';
 
 export class AnalysisContext {
   private _expectedReturnType: KinaTypeTokenKind | null = null;
+  private _compiler: KinaCompiler;
+  private _filePath: string;
 
-  constructor() {}
+  constructor(compiler: KinaCompiler, filePath: string) {
+    this._compiler = compiler;
+    this._filePath = filePath;
+  }
 
   public setExpectedReturnType(type: KinaTypeTokenKind | null) {
     this._expectedReturnType = type;
@@ -11,5 +18,13 @@ export class AnalysisContext {
 
   public getExpectedReturnType(): KinaTypeTokenKind | null {
     return this._expectedReturnType;
+  }
+
+  public get compiler(): KinaCompiler {
+    return this._compiler;
+  }
+
+  public get filePath(): string {
+    return this._filePath;
   }
 }

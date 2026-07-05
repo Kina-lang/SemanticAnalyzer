@@ -16,6 +16,8 @@ import type {
   VariableDeclarationStatementNode,
 } from '@kina-lang/ast';
 import { NodeKind } from '@kina-lang/ast';
+import type { ImportNode } from '@kina-lang/ast/src/classes/nodes/Import';
+import type { KinaCompiler } from '@kina-lang/compiler';
 import { KinaAssertionError } from '@kina-lang/utils';
 
 import { AnalysisContext } from './AnalysisContext';
@@ -25,9 +27,13 @@ import { Scope } from './Scope';
 import type { KinaTypeTokenKind } from '../types/type';
 
 export class KinaSemanticAnalyzer {
-  public analyze(ast: FileNode): Scope {
+  public analyze(
+    ast: FileNode,
+    compiler: KinaCompiler,
+    filePath: string,
+  ): Scope {
     const rootScope = new Scope(null);
-    const ctx = new AnalysisContext();
+    const ctx = new AnalysisContext(compiler, filePath);
 
     this.firstPass(ast, rootScope, ctx);
     this.secondPass(ast, rootScope, ctx);
@@ -104,6 +110,10 @@ export class KinaSemanticAnalyzer {
         const ifStatementNode = node as IfStatementNode;
         Checkers.IfStatement.check(ifStatementNode, scope, ctx);
         break;
+      case NodeKind.Import:
+        const importNode = node as ImportNode;
+        Checkers.Import.check(importNode, scope, ctx);
+        break;
       case NodeKind.IncludeDirective:
         // no op: Ignored
         // TODO: Add symbol registration so that we can correctly check extern signatures
@@ -131,11 +141,16 @@ export class KinaSemanticAnalyzer {
         const functionNode = node as FunctionNode;
         Checkers.Function.firstPass(functionNode, scope, ctx);
         break;
+      case NodeKind.Import:
+        const importNode = node as ImportNode;
+        Checkers.Import.firstPass(importNode, scope, ctx);
+        break;
       case NodeKind.VariableDeclarationStatement:
       case NodeKind.BasicBlock:
       case NodeKind.ReturnStatement:
       case NodeKind.ExpressionStatement:
       case NodeKind.IncludeDirective:
+      case NodeKind.IfStatement:
         // no op: Ignored
         break;
       default:

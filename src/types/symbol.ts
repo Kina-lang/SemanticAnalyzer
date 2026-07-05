@@ -4,4 +4,5 @@ export enum SymbolKind {
   FunctionParameter = 'sym.FunctionParameter',
   Extern = 'sym.Extern',
   BasicBlock = 'sym.BasicBlock',
+  ImportedFunction = 'sym.ImportedFunction',
 }
