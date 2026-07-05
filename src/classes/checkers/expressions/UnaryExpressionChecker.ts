@@ -30,6 +30,8 @@ export class UnaryExpressionChecker extends ExpressionChecker {
       case '+':
       case '-':
         return this.checkMathOperation(node, scope, context, wantedType);
+      case '!':
+        return this.checkLogicalNotOperation(node, scope, context, wantedType);
       default:
         throw new KinaAssertionError(
           'Unknown unary operator: ' + node.operator,
@@ -62,5 +64,26 @@ export class UnaryExpressionChecker extends ExpressionChecker {
       );
 
     return rightType;
+  }
+
+  private checkLogicalNotOperation(
+    node: UnaryExpressionNode,
+    scope: Scope,
+    context: AnalysisContext,
+    wantedType?: KinaTypeTokenKind | null,
+  ): KinaTypeTokenKind {
+    const rightType = KinaSemanticAnalyzer.checkExpression(
+      node.right,
+      scope,
+      context,
+      wantedType,
+    );
+
+    if (rightType !== TokenKind.TypeBool)
+      throw new KinaSemanticError(
+        `Type mismatch in logical not operation: operand is '${rightType}'.`,
+      );
+
+    return TokenKind.TypeBool;
   }
 }
