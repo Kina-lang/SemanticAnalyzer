@@ -9,6 +9,7 @@ import type {
   FunctionNode,
   GroupExpressionNode,
   IdentifierExpressionNode,
+  IfStatementNode,
   LiteralExpressionNode,
   ReturnStatementNode,
   UnaryExpressionNode,
@@ -98,6 +99,10 @@ export class KinaSemanticAnalyzer {
       case NodeKind.ExpressionStatement:
         const expressionStatementNode = node as ExpressionStatementNode;
         Checkers.ExpressionStatement.check(expressionStatementNode, scope, ctx);
+        break;
+      case NodeKind.IfStatement:
+        const ifStatementNode = node as IfStatementNode;
+        Checkers.IfStatement.check(ifStatementNode, scope, ctx);
         break;
       case NodeKind.IncludeDirective:
         // no op: Ignored

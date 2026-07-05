@@ -10,6 +10,7 @@ import { ExternChecker } from './ExternChecker';
 import { FileChecker } from './FileChecker';
 import { FunctionChecker } from './FunctionChecker';
 import { FunctionParameterChecker } from './FunctionParameterChecker';
+import { IfStatementChecker } from './IfStatementChecker';
 import { ReturnStatementChecker } from './ReturnStatementChecker';
 import { VariableDeclarationChecker } from './VariableDeclarationChecker';
 
@@ -19,6 +20,7 @@ export const Checkers = {
   Function: new FunctionChecker(),
   FunctionParameter: new FunctionParameterChecker(),
   BasicBlock: new BasicBlockChecker(),
+  IfStatement: new IfStatementChecker(),
   VariableDeclaration: new VariableDeclarationChecker(),
   ReturnStatement: new ReturnStatementChecker(),
   ExpressionStatement: new ExpressionStatementChecker(),

@@ -1,4 +1,7 @@
-import type { VariableDeclarationStatementNode } from '@kina-lang/ast';
+import type {
+  BaseNode,
+  VariableDeclarationStatementNode,
+} from '@kina-lang/ast';
 import { KinaSemanticError } from '@kina-lang/utils';
 
 import { BaseChecker } from './_base';
@@ -39,6 +42,12 @@ export class VariableDeclarationChecker extends BaseChecker {
         `Type mismatch: expected '${wantedType}', but got '${initializerType}'.`,
       );
   }
+
+  override firstPass(
+    node: BaseNode,
+    scope: Scope,
+    context: AnalysisContext,
+  ): void {}
 
   private checkInitializer(
     node: VariableDeclarationStatementNode,
