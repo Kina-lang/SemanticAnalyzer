@@ -3,6 +3,7 @@ import type {
   BasicBlockNode,
   BinaryExpressionNode,
   CallExpressionNode,
+  ExportNode,
   ExpressionStatementNode,
   ExternNode,
   FileNode,
@@ -24,6 +25,7 @@ import { AnalysisContext } from './AnalysisContext';
 import { Checkers } from './checkers/_index';
 import { Rules } from './rules/_index';
 import { Scope } from './Scope';
+import type { IAnalysisMeta } from '../types/meta';
 import type { KinaTypeTokenKind } from '../types/type';
 
 export class KinaSemanticAnalyzer {
@@ -115,6 +117,10 @@ export class KinaSemanticAnalyzer {
         const importNode = node as ImportNode;
         Checkers.Import.check(importNode, scope, ctx);
         break;
+      case NodeKind.Export:
+        const exportNode = node as ExportNode;
+        Checkers.Export.check(exportNode, scope, ctx);
+        break;
       case NodeKind.IncludeDirective:
         // no op: Ignored
         // TODO: Add symbol registration so that we can correctly check extern signatures
@@ -128,23 +134,28 @@ export class KinaSemanticAnalyzer {
     node: BaseNode,
     scope: Scope,
     ctx: AnalysisContext,
+    meta?: Partial<IAnalysisMeta>,
   ): Promise<void> {
     switch (node.kind) {
       case NodeKind.File:
         const fileNode = node as FileNode;
-        await Checkers.File.firstPass(fileNode, scope, ctx);
+        await Checkers.File.firstPass(fileNode, scope, ctx, meta);
         break;
       case NodeKind.Extern:
         const externNode = node as ExternNode;
-        await Checkers.Extern.firstPass(externNode, scope, ctx);
+        await Checkers.Extern.firstPass(externNode, scope, ctx, meta);
         break;
       case NodeKind.Function:
         const functionNode = node as FunctionNode;
-        await Checkers.Function.firstPass(functionNode, scope, ctx);
+        await Checkers.Function.firstPass(functionNode, scope, ctx, meta);
         break;
       case NodeKind.Import:
         const importNode = node as ImportNode;
-        await Checkers.Import.firstPass(importNode, scope, ctx);
+        await Checkers.Import.firstPass(importNode, scope, ctx, meta);
+        break;
+      case NodeKind.Export:
+        const exportNode = node as ExportNode;
+        await Checkers.Export.firstPass(exportNode, scope, ctx, meta);
         break;
       case NodeKind.VariableDeclarationStatement:
       case NodeKind.BasicBlock:

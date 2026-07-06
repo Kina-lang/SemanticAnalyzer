@@ -1,6 +1,7 @@
-import type { BasicBlockNode } from '@kina-lang/ast';
+import type { BaseNode, BasicBlockNode } from '@kina-lang/ast';
 
 import { BaseChecker } from './_base';
+import type { IAnalysisMeta } from '../../types/meta';
 import type { AnalysisContext } from '../AnalysisContext';
 import { KinaSemanticAnalyzer } from '../KinaSemanticAnalyzer';
 import { Scope } from '../Scope';
@@ -10,6 +11,13 @@ export class BasicBlockChecker extends BaseChecker {
   constructor() {
     super();
   }
+
+  override firstPass(
+    node: BaseNode,
+    scope: Scope,
+    context: AnalysisContext,
+    meta?: Partial<IAnalysisMeta>,
+  ): void {}
 
   override check(
     node: BasicBlockNode,

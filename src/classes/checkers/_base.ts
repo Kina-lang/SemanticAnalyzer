@@ -1,5 +1,6 @@
 import type { BaseNode } from '@kina-lang/ast';
 
+import type { IAnalysisMeta } from '../../types/meta';
 import type { KinaTypeTokenKind } from '../../types/type';
 import type { AnalysisContext } from '../AnalysisContext';
 import type { Scope } from '../Scope';
@@ -10,6 +11,7 @@ export abstract class BaseChecker {
     node: BaseNode,
     scope: Scope,
     context: AnalysisContext,
+    meta?: Partial<IAnalysisMeta>,
   ): void;
 }
 

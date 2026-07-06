@@ -3,6 +3,7 @@ import { TokenKind } from '@kina-lang/lexer';
 import { KinaSemanticError } from '@kina-lang/utils';
 
 import { BaseChecker } from './_base';
+import type { IAnalysisMeta } from '../../types/meta';
 import type { AnalysisContext } from '../AnalysisContext';
 import { KinaSemanticAnalyzer } from '../KinaSemanticAnalyzer';
 import type { Scope } from '../Scope';
@@ -26,6 +27,7 @@ export class IfStatementChecker extends BaseChecker {
     node: BaseNode,
     scope: Scope,
     context: AnalysisContext,
+    meta?: Partial<IAnalysisMeta>,
   ): void {}
 
   private checkCondition(

@@ -6,6 +6,7 @@ import {
 import { KinaAssertionError, KinaSemanticError } from '@kina-lang/utils';
 
 import { BaseChecker } from './_base';
+import type { IAnalysisMeta } from '../../types/meta';
 import type { AnalysisContext } from '../AnalysisContext';
 import type { Scope } from '../Scope';
 import { FunctionParameterSymbol } from '../symbols/FunctionParameterSymbol';
@@ -25,6 +26,7 @@ export class FunctionParameterChecker extends BaseChecker {
     node: BaseNode,
     scope: Scope,
     context: AnalysisContext,
+    meta?: Partial<IAnalysisMeta>,
   ): void {}
 
   checkParameter(

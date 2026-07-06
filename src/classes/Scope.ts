@@ -30,11 +30,21 @@ export class Scope {
   /**
    * Looks up symbol in the current scope (preferentially) and its parent scopes.
    * @param name
+   * @param exportedOnly If true, only looks up symbols that are exported. Defaults to false.
    * @returns
    */
-  public lookup(name: string): BaseSymbol | null {
-    if (this._symbols.has(name)) return this._symbols.get(name)!;
-    if (this._parent) return this._parent.lookup(name);
+  public lookup(
+    name: string,
+    exportedOnly: boolean = false,
+  ): BaseSymbol | null {
+    if (this._symbols.has(name)) {
+      const symbol = this._symbols.get(name)!;
+      if (exportedOnly && !('isExported' in symbol && symbol.isExported))
+        return null;
+
+      return symbol;
+    }
+    if (this._parent) return this._parent.lookup(name, exportedOnly);
 
     return null;
   }

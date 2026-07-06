@@ -1,8 +1,9 @@
-import type { ReturnStatementNode } from '@kina-lang/ast';
+import type { BaseNode, ReturnStatementNode } from '@kina-lang/ast';
 import { TokenKind } from '@kina-lang/lexer';
 import { KinaSemanticError } from '@kina-lang/utils';
 
 import { BaseChecker } from './_base';
+import type { IAnalysisMeta } from '../../types/meta';
 import type { KinaTypeTokenKind } from '../../types/type';
 import type { AnalysisContext } from '../AnalysisContext';
 import { KinaSemanticAnalyzer } from '../KinaSemanticAnalyzer';
@@ -12,6 +13,13 @@ export class ReturnStatementChecker extends BaseChecker {
   constructor() {
     super();
   }
+
+  override firstPass(
+    node: BaseNode,
+    scope: Scope,
+    context: AnalysisContext,
+    meta?: Partial<IAnalysisMeta>,
+  ): void {}
 
   override check(
     node: ReturnStatementNode,

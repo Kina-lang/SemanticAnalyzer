@@ -5,6 +5,7 @@ import type {
 import { KinaSemanticError } from '@kina-lang/utils';
 
 import { BaseChecker } from './_base';
+import type { IAnalysisMeta } from '../../types/meta';
 import type { KinaTypeTokenKind } from '../../types/type';
 import type { AnalysisContext } from '../AnalysisContext';
 import { KinaSemanticAnalyzer } from '../KinaSemanticAnalyzer';
@@ -47,6 +48,7 @@ export class VariableDeclarationChecker extends BaseChecker {
     node: BaseNode,
     scope: Scope,
     context: AnalysisContext,
+    meta?: Partial<IAnalysisMeta>,
   ): void {}
 
   private checkInitializer(

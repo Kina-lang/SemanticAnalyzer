@@ -3,6 +3,7 @@ import type { ImportNode } from '@kina-lang/ast/src/classes/nodes/Import';
 import { KinaAssertionError, KinaSemanticError } from '@kina-lang/utils';
 
 import { BaseChecker } from './_base';
+import type { IAnalysisMeta } from '../../types/meta';
 import type { AnalysisContext } from '../AnalysisContext';
 import type { Scope } from '../Scope';
 import type { FunctionSymbol } from '../symbols/FunctionSymbol';
@@ -17,7 +18,11 @@ export class ImportChecker extends BaseChecker {
     node: ImportNode,
     scope: Scope,
     context: AnalysisContext,
+    meta?: Partial<IAnalysisMeta>,
   ): Promise<void> {
+    if (meta && meta.isExported == true)
+      throw new KinaSemanticError('Imports cannot be exported');
+
     if (node.isExtern) this.processExternImport(node, scope, context);
     else await this.processRegularImport(node, scope, context);
   }
@@ -50,7 +55,10 @@ export class ImportChecker extends BaseChecker {
     for (const identifier of node.members) {
       const functionName = identifier.name;
 
-      const symbolInfo = importScope.lookup(functionName) as FunctionSymbol;
+      const symbolInfo = importScope.lookup(
+        functionName,
+        true,
+      ) as FunctionSymbol;
       if (!symbolInfo)
         throw new KinaSemanticError(
           `Function ${functionName} not found in ${filePath}`,
@@ -85,7 +93,10 @@ export class ImportChecker extends BaseChecker {
     for (const identifier of node.members) {
       const functionName = identifier.name;
 
-      const symbolInfo = importScope.lookup(functionName) as FunctionSymbol;
+      const symbolInfo = importScope.lookup(
+        functionName,
+        true,
+      ) as FunctionSymbol;
       if (!symbolInfo)
         throw new KinaSemanticError(
           `Function ${functionName} not found in ${filePath}`,

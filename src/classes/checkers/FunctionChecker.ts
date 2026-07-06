@@ -3,6 +3,7 @@ import { KinaAssertionError } from '@kina-lang/utils';
 
 import { BaseChecker } from './_base';
 import { Checkers } from './_index';
+import type { IAnalysisMeta } from '../../types/meta';
 import type { AnalysisContext } from '../AnalysisContext';
 import { Scope } from '../Scope';
 import { FunctionSymbol } from '../symbols/FunctionSymbol';
@@ -35,6 +36,7 @@ export class FunctionChecker extends BaseChecker {
     node: FunctionNode,
     scope: Scope,
     context: AnalysisContext,
+    meta?: Partial<IAnalysisMeta>,
   ): void {
     if (scope.existsInCurrentScope(node.name))
       throw new Error(
@@ -56,6 +58,7 @@ export class FunctionChecker extends BaseChecker {
       parameterSymbols,
       node.returnType,
       functionScope,
+      meta?.isExported ?? false,
     );
 
     scope.define(node.name, functionSymbol);

@@ -1,4 +1,5 @@
 import { BasicBlockChecker } from './BasicBlockChecker';
+import { ExportChecker } from './ExportChecker';
 import { BinaryExpressionChecker } from './expressions/BinaryExpressionChecker';
 import { CallExpressionChecker } from './expressions/CallExpressionChecker';
 import { GroupExpressionChecker } from './expressions/GroupExpressionChecker';
@@ -26,6 +27,7 @@ export const Checkers = {
   ReturnStatement: new ReturnStatementChecker(),
   ExpressionStatement: new ExpressionStatementChecker(),
   Import: new ImportChecker(),
+  Export: new ExportChecker(),
   Expression: {
     Literal: new LiteralExpressionChecker(),
     Call: new CallExpressionChecker(),

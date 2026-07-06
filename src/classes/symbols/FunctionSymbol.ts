@@ -10,6 +10,7 @@ export class FunctionSymbol extends BaseSymbol<FunctionNode> {
   protected readonly _parameterSymbols: FunctionParameterSymbol[];
   protected readonly _returnType: KinaTypeTokenKind;
   protected readonly _scope: Scope;
+  protected readonly _isExported: boolean;
 
   constructor(
     node: FunctionNode,
@@ -17,12 +18,14 @@ export class FunctionSymbol extends BaseSymbol<FunctionNode> {
     parameterSymbols: FunctionParameterSymbol[],
     returnType: KinaTypeTokenKind,
     scope: Scope,
+    isExported: boolean,
   ) {
     super(SymbolKind.Function, node, name);
 
     this._parameterSymbols = parameterSymbols;
     this._returnType = returnType;
     this._scope = scope;
+    this._isExported = isExported;
   }
 
   public get parameterSymbols(): FunctionParameterSymbol[] {
@@ -41,12 +44,17 @@ export class FunctionSymbol extends BaseSymbol<FunctionNode> {
     return this._scope;
   }
 
+  public get isExported(): boolean {
+    return this._isExported;
+  }
+
   public override export(): Record<string, unknown> {
     return {
       ...super.export(),
       parameterSymbols: this._parameterSymbols.map((param) => param.export()),
       returnType: this._returnType,
       scope: this._scope.export(),
+      isExported: this._isExported,
     };
   }
 }
