@@ -16,13 +16,13 @@ export class FileChecker extends BaseChecker {
     }
   }
 
-  override firstPass(
+  override async firstPass(
     node: FileNode,
     scope: Scope,
     context: AnalysisContext,
-  ): void {
+  ): Promise<void> {
     for (const subNode of node.nodes) {
-      KinaSemanticAnalyzer.firstPassNode(subNode, scope, context);
+      await KinaSemanticAnalyzer.firstPassNode(subNode, scope, context);
     }
   }
 }

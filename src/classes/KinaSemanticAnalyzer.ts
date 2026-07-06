@@ -27,29 +27,30 @@ import { Scope } from './Scope';
 import type { KinaTypeTokenKind } from '../types/type';
 
 export class KinaSemanticAnalyzer {
-  public analyze(
+  public async analyze(
     ast: FileNode,
     compiler: KinaCompiler,
     filePath: string,
-  ): Scope {
+    isIncluded: boolean = false,
+  ): Promise<Scope> {
     const rootScope = new Scope(null);
     const ctx = new AnalysisContext(compiler, filePath);
 
-    this.firstPass(ast, rootScope, ctx);
-    this.secondPass(ast, rootScope, ctx);
+    await this.firstPass(ast, rootScope, ctx);
+    await this.secondPass(ast, rootScope, ctx);
 
-    this.validateRules(rootScope, ctx);
+    await this.validateRules(rootScope, ctx, isIncluded);
 
     return rootScope;
   }
 
   // First pass, register only
-  public firstPass(
+  public async firstPass(
     ast: FileNode,
     rootScope: Scope,
     ctx: AnalysisContext,
-  ): void {
-    KinaSemanticAnalyzer.firstPassNode(ast, rootScope, ctx);
+  ): Promise<void> {
+    await KinaSemanticAnalyzer.firstPassNode(ast, rootScope, ctx);
   }
 
   // Second pass, validate
@@ -123,27 +124,27 @@ export class KinaSemanticAnalyzer {
     }
   }
 
-  public static firstPassNode(
+  public static async firstPassNode(
     node: BaseNode,
     scope: Scope,
     ctx: AnalysisContext,
-  ): void {
+  ): Promise<void> {
     switch (node.kind) {
       case NodeKind.File:
         const fileNode = node as FileNode;
-        Checkers.File.firstPass(fileNode, scope, ctx);
+        await Checkers.File.firstPass(fileNode, scope, ctx);
         break;
       case NodeKind.Extern:
         const externNode = node as ExternNode;
-        Checkers.Extern.firstPass(externNode, scope, ctx);
+        await Checkers.Extern.firstPass(externNode, scope, ctx);
         break;
       case NodeKind.Function:
         const functionNode = node as FunctionNode;
-        Checkers.Function.firstPass(functionNode, scope, ctx);
+        await Checkers.Function.firstPass(functionNode, scope, ctx);
         break;
       case NodeKind.Import:
         const importNode = node as ImportNode;
-        Checkers.Import.firstPass(importNode, scope, ctx);
+        await Checkers.Import.firstPass(importNode, scope, ctx);
         break;
       case NodeKind.VariableDeclarationStatement:
       case NodeKind.BasicBlock:
@@ -225,9 +226,13 @@ export class KinaSemanticAnalyzer {
     }
   }
 
-  public validateRules(scope: Scope, ctx: AnalysisContext): void {
+  public validateRules(
+    scope: Scope,
+    ctx: AnalysisContext,
+    isIncluded: boolean,
+  ): void {
     for (const rule of Rules) {
-      rule.validate(scope, ctx);
+      rule.validate(scope, ctx, isIncluded);
     }
   }
 }

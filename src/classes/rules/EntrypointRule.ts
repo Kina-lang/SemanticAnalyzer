@@ -12,7 +12,13 @@ export class EntrypointRule extends BaseRule {
     super();
   }
 
-  override validate(scope: Scope, context: AnalysisContext): void {
+  override validate(
+    scope: Scope,
+    context: AnalysisContext,
+    isIncluded: boolean,
+  ): void {
+    if (isIncluded) return;
+
     if (!scope.existsInCurrentScope('main'))
       throw new KinaSemanticError("No entrypoint function 'main' found.");
 
