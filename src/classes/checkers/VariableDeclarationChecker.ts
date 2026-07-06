@@ -11,6 +11,7 @@ import type { AnalysisContext } from '../AnalysisContext';
 import { KinaSemanticAnalyzer } from '../KinaSemanticAnalyzer';
 import type { Scope } from '../Scope';
 import { VariableSymbol } from '../symbols/VariableSymbol';
+import { resolveASTType } from '../../utils/type';
 
 export class VariableDeclarationChecker extends BaseChecker {
   constructor() {
@@ -27,15 +28,17 @@ export class VariableDeclarationChecker extends BaseChecker {
         `Symbol '${node.name}' is already defined in the current scope.`,
       );
 
+    const resolvedType = resolveASTType(node.type);
+
     const symbol = new VariableSymbol(
       node,
       node.name,
-      node.type,
+      resolvedType,
       node.isMutable,
     );
     scope.define(node.name, symbol);
 
-    const wantedType = node.type ?? null;
+    const wantedType = resolvedType;
     const initializerType = this.checkInitializer(node, scope, ctx, wantedType);
 
     if (wantedType !== null && initializerType !== wantedType)

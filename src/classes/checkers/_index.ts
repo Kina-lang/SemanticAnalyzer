@@ -6,6 +6,7 @@ import { GroupExpressionChecker } from './expressions/GroupExpressionChecker';
 import { IdentifierExpressionChecker } from './expressions/IdentifierExpressionChecker';
 import { LiteralExpressionChecker } from './expressions/LiteralExpressionChecker';
 import { UnaryExpressionChecker } from './expressions/UnaryExpressionChecker';
+import { MemberAccessExpressionChecker } from './expressions/MemberAccessExpressionChecker';
 import { ExpressionStatementChecker } from './ExpressionStatementChecker';
 import { ExternChecker } from './ExternChecker';
 import { FileChecker } from './FileChecker';
@@ -35,5 +36,6 @@ export const Checkers = {
     Group: new GroupExpressionChecker(),
     Binary: new BinaryExpressionChecker(),
     Unary: new UnaryExpressionChecker(),
+    MemberAccess: new MemberAccessExpressionChecker(),
   },
 };

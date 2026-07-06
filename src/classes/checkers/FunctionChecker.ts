@@ -8,6 +8,8 @@ import type { AnalysisContext } from '../AnalysisContext';
 import { Scope } from '../Scope';
 import { FunctionSymbol } from '../symbols/FunctionSymbol';
 
+import { resolveASTType } from '../../utils/type';
+
 export class FunctionChecker extends BaseChecker {
   constructor() {
     super();
@@ -22,8 +24,9 @@ export class FunctionChecker extends BaseChecker {
 
     const functionScope = functionSymbol.scope;
 
+    const resolvedReturnType = resolveASTType(node.returnType);
     const previousExpectedReturnType = ctx.getExpectedReturnType();
-    ctx.setExpectedReturnType(node.returnType);
+    ctx.setExpectedReturnType(resolvedReturnType);
 
     // TODO: Ensure that the block ALWAYS returns on all code paths
     //       using reachability analysis and control flow graph (CFG) analysis.
@@ -56,7 +59,7 @@ export class FunctionChecker extends BaseChecker {
       node,
       node.name,
       parameterSymbols,
-      node.returnType,
+      resolveASTType(node.returnType),
       functionScope,
       meta?.isExported ?? false,
     );

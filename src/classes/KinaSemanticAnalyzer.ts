@@ -15,6 +15,7 @@ import type {
   ReturnStatementNode,
   UnaryExpressionNode,
   VariableDeclarationStatementNode,
+  MemberAccessExpressionNode,
 } from '@kina-lang/ast';
 import { NodeKind } from '@kina-lang/ast';
 import type { ImportNode } from '@kina-lang/ast/src/classes/nodes/Import';
@@ -226,9 +227,12 @@ export class KinaSemanticAnalyzer {
           wantedType,
         );
       case NodeKind.MemberAccessExpression:
-        // TODO: Implement
-        throw new KinaAssertionError(
-          'Member access expressions are not yet supported.',
+        const memberAccessExpressionNode = node as MemberAccessExpressionNode;
+        return Checkers.Expression.MemberAccess.check(
+          memberAccessExpressionNode,
+          scope,
+          ctx,
+          wantedType,
         );
       default:
         throw new KinaAssertionError(

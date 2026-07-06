@@ -30,6 +30,8 @@ export class LiteralExpressionChecker extends ExpressionChecker {
         return this.getIntegerLiteralType(node, scope, context, wantedType);
       case TokenKind.LiteralBoolean:
         return this.getBooleanLiteralType(node, scope, context, wantedType);
+      case TokenKind.LiteralString:
+        return TokenKind.TypeString;
       default:
         throw new KinaAssertionError(
           `Unknown literal type: ${node.literalType}`,

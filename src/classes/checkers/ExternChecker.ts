@@ -7,6 +7,8 @@ import type { AnalysisContext } from '../AnalysisContext';
 import type { Scope } from '../Scope';
 import { ExternSymbol } from '../symbols/ExternSymbol';
 
+import { resolveASTType } from '../../utils/type';
+
 export class ExternChecker extends BaseChecker {
   constructor() {
     super();
@@ -30,11 +32,14 @@ export class ExternChecker extends BaseChecker {
         `Symbol '${node.name}' is already defined in the current scope.`,
       );
 
+    const resolvedParameterTypes = node.parameterTypes.map(resolveASTType);
+    const resolvedReturnType = resolveASTType(node.returnType);
+
     const symbol = new ExternSymbol(
       node,
       node.name,
-      node.parameterTypes,
-      node.returnType,
+      resolvedParameterTypes,
+      resolvedReturnType,
     );
     scope.define(node.name, symbol);
   }
