@@ -23,7 +23,7 @@ export class ImportChecker extends BaseChecker {
     if (meta && meta.isExported == true)
       throw new KinaSemanticError('Imports cannot be exported');
 
-    if (node.isExtern) this.processExternImport(node, scope, context);
+    if (node.isExtern) await this.processExternImport(node, scope, context);
     else await this.processRegularImport(node, scope, context);
   }
 
@@ -42,12 +42,12 @@ export class ImportChecker extends BaseChecker {
     scope: Scope,
     context: AnalysisContext,
   ): Promise<void> {
-    const filePath = context.compiler.resolveNamespacedPath(
+    const filePath = context.compiler.pathResolver.resolveNamespacedPath(
       node.source.value,
       context.filePath,
     );
 
-    const { scope: importScope } = await context.compiler.compileIncludedFile(
+    const { scope: importScope } = await context.compiler.compileIncluded(
       filePath,
       context.filePath,
     );
@@ -80,12 +80,12 @@ export class ImportChecker extends BaseChecker {
     scope: Scope,
     context: AnalysisContext,
   ): Promise<void> {
-    const filePath = context.compiler.resolveIncludePath(
+    const filePath = context.compiler.pathResolver.resolveIncludePath(
       node.source.value,
       context.filePath,
     );
 
-    const { scope: importScope } = await context.compiler.compileIncludedFile(
+    const { scope: importScope } = await context.compiler.compileIncluded(
       filePath,
       context.filePath,
     );
@@ -113,12 +113,12 @@ export class ImportChecker extends BaseChecker {
     }
   }
 
-  private processExternImport(
+  private async processExternImport(
     node: ImportNode,
     scope: Scope,
     context: AnalysisContext,
-  ): void {
-    const filePath = context.compiler.resolveIncludePath(
+  ): Promise<void> {
+    const filePath = context.compiler.pathResolver.resolveIncludePath(
       node.source.value,
       context.filePath,
     );
@@ -128,7 +128,7 @@ export class ImportChecker extends BaseChecker {
         'Only C files can be imported using extern.',
       );
 
-    const symbols = context.compiler.getCSymbols(filePath);
+    const symbols = context.compiler.cSymbols.get(filePath);
 
     for (const identifier of node.members) {
       const functionName = identifier.name;
@@ -148,7 +148,7 @@ export class ImportChecker extends BaseChecker {
 
       scope.define(functionName, importedFunctionSymbol);
 
-      context.compiler.includeFile(filePath);
+      await context.compiler.compileIncludedC(filePath, context.filePath);
     }
   }
 
