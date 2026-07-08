@@ -5,4 +5,5 @@ export type KinaTypeTokenKind =
   | TokenKind.TypeInt
   | TokenKind.TypeVoid
   | TokenKind.TypeString
-  | TokenKind.TypePtr;
+  | TokenKind.TypePtr
+  | '___kina_internal_string';

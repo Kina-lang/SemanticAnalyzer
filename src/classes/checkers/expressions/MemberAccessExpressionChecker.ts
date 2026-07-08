@@ -34,12 +34,21 @@ export class MemberAccessExpressionChecker extends ExpressionChecker {
     );
 
     if (objectType === TokenKind.TypeString) {
-      if (node.property === '___kina_internal_length') return TokenKind.TypeInt;
-      if (node.property === '___kina_internal_pointer')
-        return TokenKind.TypePtr;
+      if (node.property === '___kina_internal') {
+        return '___kina_internal_string' as KinaTypeTokenKind;
+      }
 
       throw new KinaSemanticError(
         `Property '${node.property}' does not exist on type 'string'.`,
+      );
+    }
+
+    if (objectType === '___kina_internal_string') {
+      if (node.property === 'length') return TokenKind.TypeInt;
+      if (node.property === 'pointer') return TokenKind.TypePtr;
+
+      throw new KinaSemanticError(
+        `Property '${node.property}' does not exist on '___kina_internal_string'.`,
       );
     }
 
