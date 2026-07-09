@@ -6,12 +6,17 @@ import { KinaSemanticError } from '@kina-lang/utils';
 
 import { BaseChecker } from './_base';
 import type { IAnalysisMeta } from '../../types/meta';
+import { SymbolKind } from '../../types/symbol';
 import type { KinaTypeTokenKind } from '../../types/type';
+import {
+  getUserDefinedTypeName,
+  isUserDefinedTypeKind,
+} from '../../types/type';
+import { resolveASTType } from '../../utils/type';
 import type { AnalysisContext } from '../AnalysisContext';
 import { KinaSemanticAnalyzer } from '../KinaSemanticAnalyzer';
 import type { Scope } from '../Scope';
 import { VariableSymbol } from '../symbols/VariableSymbol';
-import { resolveASTType } from '../../utils/type';
 
 export class VariableDeclarationChecker extends BaseChecker {
   constructor() {
@@ -29,6 +34,19 @@ export class VariableDeclarationChecker extends BaseChecker {
       );
 
     const resolvedType = resolveASTType(node.type);
+
+    // Validate that user-defined types are actually defined in scope
+    if (isUserDefinedTypeKind(resolvedType)) {
+      const typeName = getUserDefinedTypeName(resolvedType)!;
+      const typeSymbol = scope.lookup(typeName);
+
+      if (typeSymbol === null)
+        throw new KinaSemanticError(`Type '${typeName}' is not defined.`);
+      if (typeSymbol.kind !== SymbolKind.Struct)
+        throw new KinaSemanticError(
+          `'${typeName}' is a ${typeSymbol.kind.toLowerCase()}, not a type.`,
+        );
+    }
 
     const symbol = new VariableSymbol(
       node,

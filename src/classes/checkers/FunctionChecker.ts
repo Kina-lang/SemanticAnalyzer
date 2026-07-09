@@ -1,14 +1,18 @@
 import { type FunctionNode } from '@kina-lang/ast';
-import { KinaAssertionError } from '@kina-lang/utils';
+import { KinaAssertionError, KinaSemanticError } from '@kina-lang/utils';
 
 import { BaseChecker } from './_base';
 import { Checkers } from './_index';
 import type { IAnalysisMeta } from '../../types/meta';
+import { SymbolKind } from '../../types/symbol';
+import {
+  getUserDefinedTypeName,
+  isUserDefinedTypeKind,
+} from '../../types/type';
+import { resolveASTType } from '../../utils/type';
 import type { AnalysisContext } from '../AnalysisContext';
 import { Scope } from '../Scope';
 import { FunctionSymbol } from '../symbols/FunctionSymbol';
-
-import { resolveASTType } from '../../utils/type';
 
 export class FunctionChecker extends BaseChecker {
   constructor() {
@@ -25,6 +29,18 @@ export class FunctionChecker extends BaseChecker {
     const functionScope = functionSymbol.scope;
 
     const resolvedReturnType = resolveASTType(node.returnType);
+
+    if (isUserDefinedTypeKind(resolvedReturnType)) {
+      const typeName = getUserDefinedTypeName(resolvedReturnType)!;
+      const typeSymbol = scope.lookup(typeName);
+
+      if (typeSymbol === null)
+        throw new KinaSemanticError(`Type '${typeName}' is not defined.`);
+      if (typeSymbol.kind !== SymbolKind.Struct)
+        throw new KinaSemanticError(
+          `'${typeName}' is a ${typeSymbol.kind.toLowerCase()}, not a type.`,
+        );
+    }
     const previousExpectedReturnType = ctx.getExpectedReturnType();
     ctx.setExpectedReturnType(resolvedReturnType);
 

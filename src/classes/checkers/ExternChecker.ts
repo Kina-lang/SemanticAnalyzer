@@ -3,11 +3,15 @@ import { KinaSemanticError } from '@kina-lang/utils';
 
 import { BaseChecker } from './_base';
 import type { IAnalysisMeta } from '../../types/meta';
+import { SymbolKind } from '../../types/symbol';
+import {
+  getUserDefinedTypeName,
+  isUserDefinedTypeKind,
+} from '../../types/type';
+import { resolveASTType } from '../../utils/type';
 import type { AnalysisContext } from '../AnalysisContext';
 import type { Scope } from '../Scope';
 import { ExternSymbol } from '../symbols/ExternSymbol';
-
-import { resolveASTType } from '../../utils/type';
 
 export class ExternChecker extends BaseChecker {
   constructor() {
@@ -34,6 +38,32 @@ export class ExternChecker extends BaseChecker {
 
     const resolvedParameterTypes = node.parameterTypes.map(resolveASTType);
     const resolvedReturnType = resolveASTType(node.returnType);
+
+    for (const paramType of resolvedParameterTypes) {
+      if (isUserDefinedTypeKind(paramType)) {
+        const typeName = getUserDefinedTypeName(paramType)!;
+        const typeSymbol = scope.lookup(typeName);
+
+        if (typeSymbol === null)
+          throw new KinaSemanticError(`Type '${typeName}' is not defined.`);
+        if (typeSymbol.kind !== SymbolKind.Struct)
+          throw new KinaSemanticError(
+            `'${typeName}' is a ${typeSymbol.kind.toLowerCase()}, not a type.`,
+          );
+      }
+    }
+
+    if (isUserDefinedTypeKind(resolvedReturnType)) {
+      const typeName = getUserDefinedTypeName(resolvedReturnType)!;
+      const typeSymbol = scope.lookup(typeName);
+
+      if (typeSymbol === null)
+        throw new KinaSemanticError(`Type '${typeName}' is not defined.`);
+      if (typeSymbol.kind !== SymbolKind.Struct)
+        throw new KinaSemanticError(
+          `'${typeName}' is a ${typeSymbol.kind.toLowerCase()}, not a type.`,
+        );
+    }
 
     const symbol = new ExternSymbol(
       node,

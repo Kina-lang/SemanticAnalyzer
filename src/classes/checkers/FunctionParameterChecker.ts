@@ -7,11 +7,15 @@ import { KinaAssertionError, KinaSemanticError } from '@kina-lang/utils';
 
 import { BaseChecker } from './_base';
 import type { IAnalysisMeta } from '../../types/meta';
+import { SymbolKind } from '../../types/symbol';
+import {
+  getUserDefinedTypeName,
+  isUserDefinedTypeKind,
+} from '../../types/type';
+import { resolveASTType } from '../../utils/type';
 import type { AnalysisContext } from '../AnalysisContext';
 import type { Scope } from '../Scope';
 import { FunctionParameterSymbol } from '../symbols/FunctionParameterSymbol';
-
-import { resolveASTType } from '../../utils/type';
 
 export class FunctionParameterChecker extends BaseChecker {
   constructor() {
@@ -45,6 +49,27 @@ export class FunctionParameterChecker extends BaseChecker {
         `Expected a FunctionParameterNode, but got ${node.kind}.`,
       );
 
-    return new FunctionParameterSymbol(node, node.name, resolveASTType(node.type), index);
+    return new FunctionParameterSymbol(
+      node,
+      node.name,
+      resolveASTType(node.type),
+      index,
+    );
+  }
+
+  validateParameterTypes(node: FunctionParameterNode, scope: Scope): void {
+    const resolvedType = resolveASTType(node.type);
+
+    if (isUserDefinedTypeKind(resolvedType)) {
+      const typeName = getUserDefinedTypeName(resolvedType)!;
+      const typeSymbol = scope.lookup(typeName);
+
+      if (typeSymbol === null)
+        throw new KinaSemanticError(`Type '${typeName}' is not defined.`);
+      if (typeSymbol.kind !== SymbolKind.Struct)
+        throw new KinaSemanticError(
+          `'${typeName}' is a ${typeSymbol.kind.toLowerCase()}, not a type.`,
+        );
+    }
   }
 }
