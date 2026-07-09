@@ -73,4 +73,12 @@ export class Scope {
       children: this._children.map((child) => child.export()),
     };
   }
+
+  public getAll() {
+    return this._symbols.values();
+  }
+
+  public get parent() {
+    return this._parent;
+  }
 }
