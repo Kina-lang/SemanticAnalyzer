@@ -17,6 +17,7 @@ import type {
   StructNode,
   UnaryExpressionNode,
   VariableDeclarationStatementNode,
+  StructLiteralExpressionNode,
 } from '@kina-lang/ast';
 import { NodeKind } from '@kina-lang/ast';
 import type { ImportNode } from '@kina-lang/ast/src/classes/nodes/Import';
@@ -239,6 +240,14 @@ export class KinaSemanticAnalyzer {
         const memberAccessExpressionNode = node as MemberAccessExpressionNode;
         return Checkers.Expression.MemberAccess.check(
           memberAccessExpressionNode,
+          scope,
+          ctx,
+          wantedType,
+        );
+      case NodeKind.StructLiteralExpression:
+        const structLiteralExpressionNode = node as StructLiteralExpressionNode;
+        return Checkers.Expression.StructLiteral.check(
+          structLiteralExpressionNode,
           scope,
           ctx,
           wantedType,

@@ -7,6 +7,7 @@ import { IdentifierExpressionChecker } from './expressions/IdentifierExpressionC
 import { LiteralExpressionChecker } from './expressions/LiteralExpressionChecker';
 import { MemberAccessExpressionChecker } from './expressions/MemberAccessExpressionChecker';
 import { UnaryExpressionChecker } from './expressions/UnaryExpressionChecker';
+import { StructLiteralExpressionChecker } from './expressions/StructLiteralExpressionChecker';
 import { ExpressionStatementChecker } from './ExpressionStatementChecker';
 import { ExternChecker } from './ExternChecker';
 import { FileChecker } from './FileChecker';
@@ -39,5 +40,6 @@ export const Checkers = {
     Binary: new BinaryExpressionChecker(),
     Unary: new UnaryExpressionChecker(),
     MemberAccess: new MemberAccessExpressionChecker(),
+    StructLiteral: new StructLiteralExpressionChecker(),
   },
 };
