@@ -5,8 +5,8 @@ import { CallExpressionChecker } from './expressions/CallExpressionChecker';
 import { GroupExpressionChecker } from './expressions/GroupExpressionChecker';
 import { IdentifierExpressionChecker } from './expressions/IdentifierExpressionChecker';
 import { LiteralExpressionChecker } from './expressions/LiteralExpressionChecker';
-import { UnaryExpressionChecker } from './expressions/UnaryExpressionChecker';
 import { MemberAccessExpressionChecker } from './expressions/MemberAccessExpressionChecker';
+import { UnaryExpressionChecker } from './expressions/UnaryExpressionChecker';
 import { ExpressionStatementChecker } from './ExpressionStatementChecker';
 import { ExternChecker } from './ExternChecker';
 import { FileChecker } from './FileChecker';
@@ -15,6 +15,7 @@ import { FunctionParameterChecker } from './FunctionParameterChecker';
 import { IfStatementChecker } from './IfStatementChecker';
 import { ImportChecker } from './ImportChecker';
 import { ReturnStatementChecker } from './ReturnStatementChecker';
+import { StructChecker } from './StructChecker';
 import { VariableDeclarationChecker } from './VariableDeclarationChecker';
 
 export const Checkers = {
@@ -29,6 +30,7 @@ export const Checkers = {
   ExpressionStatement: new ExpressionStatementChecker(),
   Import: new ImportChecker(),
   Export: new ExportChecker(),
+  Struct: new StructChecker(),
   Expression: {
     Literal: new LiteralExpressionChecker(),
     Call: new CallExpressionChecker(),

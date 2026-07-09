@@ -12,10 +12,11 @@ import type {
   IdentifierExpressionNode,
   IfStatementNode,
   LiteralExpressionNode,
+  MemberAccessExpressionNode,
   ReturnStatementNode,
+  StructNode,
   UnaryExpressionNode,
   VariableDeclarationStatementNode,
-  MemberAccessExpressionNode,
 } from '@kina-lang/ast';
 import { NodeKind } from '@kina-lang/ast';
 import type { ImportNode } from '@kina-lang/ast/src/classes/nodes/Import';
@@ -122,6 +123,10 @@ export class KinaSemanticAnalyzer {
         const exportNode = node as ExportNode;
         Checkers.Export.check(exportNode, scope, ctx);
         break;
+      case NodeKind.Struct:
+        const structNode = node as StructNode;
+        Checkers.Struct.check(structNode, scope, ctx);
+        break;
       case NodeKind.IncludeDirective:
         // no op: Ignored
         // TODO: Add symbol registration so that we can correctly check extern signatures
@@ -157,6 +162,10 @@ export class KinaSemanticAnalyzer {
       case NodeKind.Export:
         const exportNode = node as ExportNode;
         await Checkers.Export.firstPass(exportNode, scope, ctx, meta);
+        break;
+      case NodeKind.Struct:
+        const structNode = node as StructNode;
+        await Checkers.Struct.firstPass(structNode, scope, ctx, meta);
         break;
       case NodeKind.VariableDeclarationStatement:
       case NodeKind.BasicBlock:
