@@ -1,14 +1,13 @@
-import { BaseNode, NodeKind, type CallExpressionNode } from '@kina-lang/ast';
-import { KinaAssertionError, KinaSemanticError } from '@kina-lang/utils';
+import { BaseNode, type CallExpressionNode } from '@kina-lang/ast';
+import { TokenKind } from '@kina-lang/lexer';
+import { KinaSemanticError } from '@kina-lang/utils';
 
 import { ExpressionChecker } from '../_base';
-import type { KinaTypeTokenKind } from '../../../types/type';
+import { type KinaTypeTokenKind } from '../../../types/type';
+import { getFunctionSignature } from '../../../utils/type';
 import type { AnalysisContext } from '../../AnalysisContext';
 import { KinaSemanticAnalyzer } from '../../KinaSemanticAnalyzer';
 import type { Scope } from '../../Scope';
-import { ExternSymbol } from '../../symbols/ExternSymbol';
-import { FunctionSymbol } from '../../symbols/FunctionSymbol';
-import { ImportedFunctionSymbol } from '../../symbols/ImportedFunctionSymbol';
 
 export class CallExpressionChecker extends ExpressionChecker {
   constructor() {
@@ -23,31 +22,23 @@ export class CallExpressionChecker extends ExpressionChecker {
   ): KinaTypeTokenKind {
     const callee = node.callee;
 
-    // TODO: Delegate this back to the expression checker
-    //       to check via function signatures (once we have them)
-    if (callee.kind !== NodeKind.IdentifierExpression)
-      throw new KinaAssertionError(
-        'Callee of a call expression must be an identifier expression (for now).',
-      );
+    const signature = getFunctionSignature(callee, scope, context);
+    if (signature) {
+      this.checkParameters(node, signature.parameterTypes, scope, context);
+      return signature.returnType;
+    }
 
-    const symbol = scope.lookup((callee as any).name);
-    if (symbol === null)
-      throw new KinaSemanticError(`${(callee as any).name} is not defined.`);
-
-    // TODO: Add support for checking signatures to allow calling
-    //       even variables for example, if they are of function type (once we have function types)
-    if (!(
-      symbol instanceof FunctionSymbol ||
-      symbol instanceof ExternSymbol ||
-      symbol instanceof ImportedFunctionSymbol
-    ))
+    const calleeType = KinaSemanticAnalyzer.checkExpression(
+      callee,
+      scope,
+      context,
+    );
+    if (calleeType !== TokenKind.TypePtr)
       throw new KinaSemanticError(
-        'Callee of a call expression must be a function or an extern.',
+        'Callee of a call expression must be a function pointer.',
       );
 
-    this.checkParameters(node, symbol, scope, context);
-
-    return symbol.returnType;
+    return wantedType ?? TokenKind.TypeVoid;
   }
 
   override firstPass(
@@ -58,11 +49,10 @@ export class CallExpressionChecker extends ExpressionChecker {
 
   private checkParameters(
     node: CallExpressionNode,
-    symbol: FunctionSymbol | ExternSymbol | ImportedFunctionSymbol,
+    expectedParameterTypes: KinaTypeTokenKind[],
     scope: Scope,
     context: AnalysisContext,
   ) {
-    const expectedParameterTypes = symbol.parameterTypes;
     const actualParameterTypes = node.arguments.map((arg, i) =>
       KinaSemanticAnalyzer.checkExpression(
         arg,
