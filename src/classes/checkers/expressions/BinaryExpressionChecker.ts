@@ -159,32 +159,49 @@ export class BinaryExpressionChecker extends ExpressionChecker {
     const leftSide = node.left;
     const rightSide = node.right;
 
-    // TODO: Add broader support
-    if (leftSide.kind !== NodeKind.IdentifierExpression)
-      throw new KinaSemanticError(
-        'Left side of assignment must be an identifier.',
-      );
+    let expectedType: KinaTypeTokenKind;
 
-    const leftSymbol = scope.lookup(
-      (leftSide as IdentifierExpressionNode).name,
-    );
-    if (!leftSymbol)
-      throw new KinaSemanticError(
-        `'${(leftSide as IdentifierExpressionNode).name}' is not defined.`,
+    if (leftSide.kind === NodeKind.IdentifierExpression) {
+      const leftSymbol = scope.lookup(
+        (leftSide as IdentifierExpressionNode).name,
       );
+      if (!leftSymbol)
+        throw new KinaSemanticError(
+          `'${(leftSide as IdentifierExpressionNode).name}' is not defined.`,
+        );
 
-    // TODO: Add broader support
-    if (
-      leftSymbol.kind !== SymbolKind.Variable &&
-      leftSymbol.kind !== SymbolKind.FunctionParameter
-    )
-      throw new KinaSemanticError(
-        `'${(leftSide as IdentifierExpressionNode).name}' is not a variable or function parameter.`,
+      // TODO: Add broader support
+      if (
+        leftSymbol.kind !== SymbolKind.Variable &&
+        leftSymbol.kind !== SymbolKind.FunctionParameter
+      )
+        throw new KinaSemanticError(
+          `'${(leftSide as IdentifierExpressionNode).name}' is not a variable or function parameter.`,
+        );
+
+      expectedType = (leftSymbol as VariableSymbol | FunctionParameterSymbol)
+        .type;
+
+      // TODO: Add support for mutability checks. For now, we will assume that function parameters are immutable.
+      if (leftSymbol.kind === SymbolKind.FunctionParameter)
+        throw new KinaSemanticError(
+          `Cannot assign to function parameter '${leftSymbol.name}'. Function parameters are immutable (for now).`,
+        );
+
+      if (!(leftSymbol as VariableSymbol).isMutable)
+        throw new KinaSemanticError(
+          `Cannot assign to variable '${leftSymbol.name}', because it is not mutable. Use 'mut' to declare a mutable variable.`,
+        );
+    } else if (leftSide.kind === NodeKind.MemberAccessExpression) {
+      expectedType = KinaSemanticAnalyzer.checkExpression(
+        leftSide,
+        scope,
+        context,
       );
-
-    const expectedType = (
-      leftSymbol as VariableSymbol | FunctionParameterSymbol
-    ).type;
+    } else
+      throw new KinaSemanticError(
+        'Left side of assignment must be an identifier or member access expression.',
+      );
 
     const actualType = KinaSemanticAnalyzer.checkExpression(
       rightSide,
@@ -196,17 +213,6 @@ export class BinaryExpressionChecker extends ExpressionChecker {
     if (actualType !== expectedType)
       throw new KinaSemanticError(
         `Type mismatch: expected '${expectedType}', but got '${actualType}'.`,
-      );
-
-    // TODO: Add support for mutability checks. For now, we will assume that function parameters are immutable.
-    if (leftSymbol.kind === SymbolKind.FunctionParameter)
-      throw new KinaSemanticError(
-        `Cannot assign to function parameter '${leftSymbol.name}'. Function parameters are immutable (for now).`,
-      );
-
-    if (!(leftSymbol as VariableSymbol).isMutable)
-      throw new KinaSemanticError(
-        `Cannot assign to variable '${leftSymbol.name}', because it is not mutable. Use 'mut' to declare a mutable variable.`,
       );
 
     return expectedType;
