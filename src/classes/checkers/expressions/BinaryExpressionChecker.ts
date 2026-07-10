@@ -10,6 +10,7 @@ import { KinaAssertionError, KinaSemanticError } from '@kina-lang/utils';
 import { ExpressionChecker } from '../_base';
 import { SymbolKind } from '../../../types/symbol';
 import type { KinaTypeTokenKind } from '../../../types/type';
+import { validateSignatureAssignment } from '../../../utils/type';
 import type { AnalysisContext } from '../../AnalysisContext';
 import { KinaSemanticAnalyzer } from '../../KinaSemanticAnalyzer';
 import type { Scope } from '../../Scope';
@@ -214,6 +215,8 @@ export class BinaryExpressionChecker extends ExpressionChecker {
       throw new KinaSemanticError(
         `Type mismatch: expected '${expectedType}', but got '${actualType}'.`,
       );
+
+    validateSignatureAssignment(leftSide, rightSide, scope, context);
 
     return expectedType;
   }

@@ -1,9 +1,11 @@
+import type { BaseNode } from '@kina-lang/ast';
 import type { KinaCompiler } from '@kina-lang/compiler';
 
 import type { KinaTypeTokenKind } from '../types/type';
 
 export class AnalysisContext {
   private _expectedReturnType: KinaTypeTokenKind | null = null;
+  private _expectedReturnASTNode: BaseNode | null = null;
   private _compiler: KinaCompiler;
   private _filePath: string;
 
@@ -18,6 +20,14 @@ export class AnalysisContext {
 
   public getExpectedReturnType(): KinaTypeTokenKind | null {
     return this._expectedReturnType;
+  }
+
+  public setExpectedReturnASTNode(node: BaseNode | null) {
+    this._expectedReturnASTNode = node;
+  }
+
+  public getExpectedReturnASTNode(): BaseNode | null {
+    return this._expectedReturnASTNode;
   }
 
   public get compiler(): KinaCompiler {

@@ -41,14 +41,18 @@ export class FunctionChecker extends BaseChecker {
           `'${typeName}' is a ${typeSymbol.kind.toLowerCase()}, not a type.`,
         );
     }
+
     const previousExpectedReturnType = ctx.getExpectedReturnType();
+    const previousExpectedReturnASTNode = ctx.getExpectedReturnASTNode();
     ctx.setExpectedReturnType(resolvedReturnType);
+    ctx.setExpectedReturnASTNode(node.returnType);
 
     // TODO: Ensure that the block ALWAYS returns on all code paths
     //       using reachability analysis and control flow graph (CFG) analysis.
     Checkers.BasicBlock.check(node.body, functionScope, ctx);
 
     ctx.setExpectedReturnType(previousExpectedReturnType);
+    ctx.setExpectedReturnASTNode(previousExpectedReturnASTNode);
   }
 
   override firstPass(

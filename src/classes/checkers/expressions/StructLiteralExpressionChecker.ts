@@ -1,5 +1,4 @@
 import {
-  FunctionTypeNode,
   type BaseNode,
   type StructLiteralExpressionNode,
 } from '@kina-lang/ast';
@@ -12,7 +11,10 @@ import {
   getUserDefinedTypeName,
   isUserDefinedTypeKind,
 } from '../../../types/type';
-import { getFunctionSignature, resolveASTType } from '../../../utils/type';
+import {
+  resolveASTType,
+  validateSignatureAssignment,
+} from '../../../utils/type';
 import type { AnalysisContext } from '../../AnalysisContext';
 import { KinaSemanticAnalyzer } from '../../KinaSemanticAnalyzer';
 import type { Scope } from '../../Scope';
@@ -101,42 +103,12 @@ export class StructLiteralExpressionChecker extends ExpressionChecker {
           `Type mismatch for field '${actualField.name}' in struct literal for '${typeName}': expected '${expectedFieldType}', but got '${actualFieldType}'.`,
         );
 
-      if (expectedField.type instanceof FunctionTypeNode) {
-        const expectedParamTypes = expectedField.type.parameters.map((param) =>
-          resolveASTType(param),
-        );
-        const expectedReturnType = resolveASTType(
-          expectedField.type.returnType,
-        );
-
-        const actualSignature = getFunctionSignature(
-          actualField.value,
-          scope,
-          context,
-        );
-
-        if (!actualSignature)
-          throw new KinaSemanticError(
-            `Incompatible function signature for field '${actualField.name}' in struct literal for '${typeName}'.`,
-          );
-
-        if (actualSignature.parameterTypes.length !== expectedParamTypes.length)
-          throw new KinaSemanticError(
-            `Incompatible function signature for field '${actualField.name}' in struct literal for '${typeName}'.`,
-          );
-
-        for (let i = 0; i < expectedParamTypes.length; i++) {
-          if (actualSignature.parameterTypes[i] !== expectedParamTypes[i])
-            throw new KinaSemanticError(
-              `Incompatible function signature for field '${actualField.name}' in struct literal for '${typeName}': parameter ${i + 1} type mismatch.`,
-            );
-        }
-
-        if (actualSignature.returnType !== expectedReturnType)
-          throw new KinaSemanticError(
-            `Incompatible function signature for field '${actualField.name}' in struct literal for '${typeName}': return type mismatch.`,
-          );
-      }
+      validateSignatureAssignment(
+        expectedField.type,
+        actualField.value,
+        scope,
+        context,
+      );
     }
 
     return wantedType;

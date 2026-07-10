@@ -9,7 +9,7 @@ import {
   type TypeBaseNode,
 } from '@kina-lang/ast';
 import { TokenKind } from '@kina-lang/lexer';
-import { KinaAssertionError } from '@kina-lang/utils';
+import { KinaAssertionError, KinaSemanticError } from '@kina-lang/utils';
 
 import type { AnalysisContext } from '../classes/AnalysisContext';
 import { KinaSemanticAnalyzer } from '../classes/KinaSemanticAnalyzer';
@@ -96,4 +96,41 @@ export function getFunctionSignature(
   }
 
   return null;
+}
+
+export function validateSignatureAssignment(
+  expectedTypeNode: TypeBaseNode | null,
+  actualValueNode: BaseNode,
+  scope: Scope,
+  context: AnalysisContext,
+) {
+  if (!expectedTypeNode) return;
+  if (!(expectedTypeNode instanceof FunctionTypeNode)) return;
+
+  const expectedParameterTypes = expectedTypeNode.parameters.map((p) =>
+    resolveASTType(p),
+  );
+  const expectedReturnType = resolveASTType(expectedTypeNode.returnType);
+
+  const actualSignature = getFunctionSignature(actualValueNode, scope, context);
+  if (!actualSignature)
+    throw new KinaAssertionError(
+      `Expected a function signature for the actual value node, but got null.`,
+    );
+  if (actualSignature.parameterTypes.length !== expectedParameterTypes.length)
+    throw new KinaSemanticError(
+      `Parameter count mismatch: expected ${expectedParameterTypes.length}, got ${actualSignature.parameterTypes.length}.`,
+    );
+
+  for (let i = 0; i < expectedParameterTypes.length; i++) {
+    if (expectedParameterTypes[i] !== actualSignature.parameterTypes[i])
+      throw new KinaSemanticError(
+        `Parameter type mismatch at index ${i}: expected ${expectedParameterTypes[i]}, got ${actualSignature.parameterTypes[i]}.`,
+      );
+  }
+
+  if (expectedReturnType !== actualSignature.returnType)
+    throw new KinaSemanticError(
+      `Return type mismatch: expected ${expectedReturnType}, got ${actualSignature.returnType}.`,
+    );
 }

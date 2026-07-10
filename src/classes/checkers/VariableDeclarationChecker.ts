@@ -12,7 +12,7 @@ import {
   getUserDefinedTypeName,
   isUserDefinedTypeKind,
 } from '../../types/type';
-import { resolveASTType } from '../../utils/type';
+import { resolveASTType, validateSignatureAssignment } from '../../utils/type';
 import type { AnalysisContext } from '../AnalysisContext';
 import { KinaSemanticAnalyzer } from '../KinaSemanticAnalyzer';
 import type { Scope } from '../Scope';
@@ -63,6 +63,8 @@ export class VariableDeclarationChecker extends BaseChecker {
       throw new KinaSemanticError(
         `Type mismatch: expected '${wantedType}', but got '${initializerType}'.`,
       );
+
+    validateSignatureAssignment(node.type, node.value, scope, ctx);
   }
 
   override firstPass(

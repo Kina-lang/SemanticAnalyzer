@@ -38,6 +38,8 @@ export class CallExpressionChecker extends ExpressionChecker {
         'Callee of a call expression must be a function pointer.',
       );
 
+    // TODO: Add call parameter signature checking
+
     return wantedType ?? TokenKind.TypeVoid;
   }
 

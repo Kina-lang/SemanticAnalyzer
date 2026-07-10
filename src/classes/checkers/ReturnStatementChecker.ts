@@ -5,6 +5,7 @@ import { KinaSemanticError } from '@kina-lang/utils';
 import { BaseChecker } from './_base';
 import type { IAnalysisMeta } from '../../types/meta';
 import type { KinaTypeTokenKind } from '../../types/type';
+import { validateSignatureAssignment } from '../../utils/type';
 import type { AnalysisContext } from '../AnalysisContext';
 import { KinaSemanticAnalyzer } from '../KinaSemanticAnalyzer';
 import type { Scope } from '../Scope';
@@ -48,6 +49,14 @@ export class ReturnStatementChecker extends BaseChecker {
     if (actualReturnType !== expectedReturnType)
       throw new KinaSemanticError(
         `Return type mismatch: expected '${expectedReturnType}', but got '${actualReturnType}'.`,
+      );
+
+    if (node.value !== null)
+      validateSignatureAssignment(
+        ctx.getExpectedReturnASTNode(),
+        node.value,
+        scope,
+        ctx,
       );
   }
 }
