@@ -10,6 +10,7 @@ import type { AnalysisContext } from '../../AnalysisContext';
 import type { Scope } from '../../Scope';
 import type { FunctionParameterSymbol } from '../../symbols/FunctionParameterSymbol';
 import type { VariableSymbol } from '../../symbols/VariableSymbol';
+import type { ImportedVariableSymbol } from '../../symbols/ImportedVariableSymbol';
 
 export class IdentifierExpressionChecker extends ExpressionChecker {
   constructor() {
@@ -36,6 +37,7 @@ export class IdentifierExpressionChecker extends ExpressionChecker {
     // TODO: Add support
     if (
       symbol.kind !== SymbolKind.Variable &&
+      symbol.kind !== SymbolKind.ImportedVariable &&
       symbol.kind !== SymbolKind.FunctionParameter &&
       symbol.kind !== SymbolKind.Function &&
       symbol.kind !== SymbolKind.ImportedFunction &&
@@ -52,6 +54,6 @@ export class IdentifierExpressionChecker extends ExpressionChecker {
     )
       return TokenKind.TypePtr;
 
-    return (symbol as VariableSymbol | FunctionParameterSymbol).type;
+    return (symbol as VariableSymbol | ImportedVariableSymbol | FunctionParameterSymbol).type;
   }
 }

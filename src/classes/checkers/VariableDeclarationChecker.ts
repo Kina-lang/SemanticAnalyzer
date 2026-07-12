@@ -1,7 +1,4 @@
-import type {
-  BaseNode,
-  VariableDeclarationStatementNode,
-} from '@kina-lang/ast';
+import type { VariableDeclarationStatementNode } from '@kina-lang/ast';
 import { KinaSemanticError } from '@kina-lang/utils';
 
 import { BaseChecker } from './_base';
@@ -75,11 +72,26 @@ export class VariableDeclarationChecker extends BaseChecker {
   }
 
   override firstPass(
-    node: BaseNode,
+    node: VariableDeclarationStatementNode,
     scope: Scope,
     context: AnalysisContext,
     meta?: Partial<IAnalysisMeta>,
-  ): void {}
+  ): void {
+    if (scope.existsInCurrentScope(node.name))
+      throw new KinaSemanticError(
+        `Symbol '${node.name}' is already defined in the current scope.`,
+      );
+
+    const globalVarSymbol = new VariableSymbol(
+      node,
+      node.name,
+      resolveASTType(node.type),
+      node.isMutable,
+      meta?.isExported ?? false,
+    );
+
+    scope.define(node.name, globalVarSymbol);
+  }
 
   private checkInitializer(
     node: VariableDeclarationStatementNode,

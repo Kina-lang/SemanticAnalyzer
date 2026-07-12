@@ -5,5 +5,6 @@ export enum SymbolKind {
   Extern = 'sym.Extern',
   BasicBlock = 'sym.BasicBlock',
   ImportedFunction = 'sym.ImportedFunction',
+  ImportedVariable = 'sym.ImportedVariable',
   Struct = 'sym.Struct',
 }

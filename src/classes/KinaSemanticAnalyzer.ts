@@ -14,10 +14,10 @@ import type {
   LiteralExpressionNode,
   MemberAccessExpressionNode,
   ReturnStatementNode,
+  StructLiteralExpressionNode,
   StructNode,
   UnaryExpressionNode,
   VariableDeclarationStatementNode,
-  StructLiteralExpressionNode,
 } from '@kina-lang/ast';
 import { NodeKind } from '@kina-lang/ast';
 import type { ImportNode } from '@kina-lang/ast/src/classes/nodes/Import';
@@ -169,6 +169,14 @@ export class KinaSemanticAnalyzer {
         await Checkers.Struct.firstPass(structNode, scope, ctx, meta);
         break;
       case NodeKind.VariableDeclarationStatement:
+        const variableDeclNode = node as VariableDeclarationStatementNode;
+        await Checkers.VariableDeclaration.firstPass(
+          variableDeclNode,
+          scope,
+          ctx,
+          meta,
+        );
+        break;
       case NodeKind.BasicBlock:
       case NodeKind.ReturnStatement:
       case NodeKind.ExpressionStatement:
