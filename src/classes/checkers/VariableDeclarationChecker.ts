@@ -53,6 +53,7 @@ export class VariableDeclarationChecker extends BaseChecker {
       node.name,
       resolvedType,
       node.isMutable,
+        false,
     );
     scope.define(node.name, symbol);
 
