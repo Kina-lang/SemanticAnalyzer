@@ -28,11 +28,6 @@ export class VariableDeclarationChecker extends BaseChecker {
     scope: Scope,
     ctx: AnalysisContext,
   ): void {
-    if (scope.existsInCurrentScope(node.name))
-      throw new Error(
-        `Symbol '${node.name}' is already defined in the current scope.`,
-      );
-
     const resolvedType = resolveASTType(node.type);
 
     // Validate that user-defined types are actually defined in scope
@@ -48,14 +43,25 @@ export class VariableDeclarationChecker extends BaseChecker {
         );
     }
 
-    const symbol = new VariableSymbol(
-      node,
-      node.name,
-      resolvedType,
-      node.isMutable,
+    let symbol = scope.existsInCurrentScope(node.name)
+      ? scope.lookup(node.name)
+      : null;
+
+    if (symbol) {
+      if (symbol.kind !== SymbolKind.Variable)
+        throw new KinaSemanticError(
+          `Symbol '${node.name}' is already defined in the current scope.`,
+        );
+    } else {
+      symbol = new VariableSymbol(
+        node,
+        node.name,
+        resolvedType,
+        node.isMutable,
         false,
-    );
-    scope.define(node.name, symbol);
+      );
+      scope.define(node.name, symbol);
+    }
 
     const wantedType = resolvedType;
     const initializerType = this.checkInitializer(node, scope, ctx, wantedType);
