@@ -1,4 +1,5 @@
 import path from 'path';
+import { UserDefinedTypeNode } from '@kina-lang/ast';
 import type { IdentifierExpressionNode } from '@kina-lang/ast';
 import type { ImportNode } from '@kina-lang/ast/src/classes/nodes/Import';
 import { KinaAssertionError, KinaSemanticError } from '@kina-lang/utils';
@@ -11,6 +12,7 @@ import type { Scope } from '../Scope';
 import type { FunctionSymbol } from '../symbols/FunctionSymbol';
 import { ImportedFunctionSymbol } from '../symbols/ImportedFunctionSymbol';
 import { ImportedVariableSymbol } from '../symbols/ImportedVariableSymbol';
+import { StructSymbol } from '../symbols/StructSymbol';
 import { VariableSymbol } from '../symbols/VariableSymbol';
 
 export class ImportChecker extends BaseChecker {
@@ -113,10 +115,7 @@ export class ImportChecker extends BaseChecker {
         const structSymbol = importScope.lookup(structName, true);
 
         if (!structSymbol || structSymbol.kind !== SymbolKind.Struct) continue;
-        if (scope.existsInCurrentScope(structName)) continue;
-
-        // Symbol was already checked in the imported file, so we can safely add it to the current scope
-        scope.define(structName, structSymbol);
+        this.autoImportStruct(structSymbol as StructSymbol, importScope, scope);
       }
     } else if (symbol.kind === SymbolKind.Variable) {
       const varSymbol = symbol as VariableSymbol;
@@ -139,15 +138,43 @@ export class ImportChecker extends BaseChecker {
       const structSymbol = importScope.lookup(structName, true);
 
       if (!structSymbol || structSymbol.kind !== SymbolKind.Struct) return;
-      if (scope.existsInCurrentScope(structName)) return;
-
-      // Symbol was already checked in the imported file, so we can safely add it to the current scope
-      scope.define(structName, structSymbol);
-    } else if (symbol.kind === SymbolKind.Struct) scope.define(name, symbol);
+      this.autoImportStruct(structSymbol as StructSymbol, importScope, scope);
+    } else if (symbol.kind === SymbolKind.Struct)
+      this.autoImportStruct(symbol as StructSymbol, importScope, scope);
     else
       throw new KinaSemanticError(
         `Importing symbol kind '${symbol.kind}' is not supported.`,
       );
+  }
+
+  private autoImportStruct(
+    structSymbol: StructSymbol,
+    importScope: Scope,
+    scope: Scope,
+  ): void {
+    const structName = structSymbol.name;
+    if (scope.existsInCurrentScope(structName)) return;
+
+    scope.define(structName, structSymbol);
+
+    for (const field of structSymbol.fields) {
+      const type = field.type;
+      let fieldStructName: string | null = null;
+
+      if (type instanceof UserDefinedTypeNode)
+        fieldStructName = type.identifier.name;
+      if (!fieldStructName) continue;
+
+      const fieldStructSymbol = importScope.lookup(fieldStructName, true);
+
+      if (fieldStructSymbol && fieldStructSymbol.kind === SymbolKind.Struct) {
+        this.autoImportStruct(
+          fieldStructSymbol as StructSymbol,
+          importScope,
+          scope,
+        );
+      }
+    }
   }
 
   private async processExternImport(
